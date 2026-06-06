@@ -212,8 +212,8 @@
                                         <span>${row.num_empenho || '-'}</span>
                                     </div>
                                     <div class="detail-item">
-                                        <strong>Contato:</strong>
-                                        <span>${row.contato || '-'}</span>
+                                        <strong>% Despachado:</strong>
+                                        <span>${formatPercent(row.perc_despacho)}</span>
                                     </div>
                                 </div>
                             </div>
