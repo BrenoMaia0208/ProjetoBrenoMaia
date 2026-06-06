@@ -142,10 +142,10 @@
                     const getStatusClass = (status) => {
                         if (!status) return '';
                         const s = status.toUpperCase();
-                        if (s.includes('ESTOQUE') || s.includes('RECEBIDO') || s === 'COMPRADO') return 'text-success';
-                        if (s.includes('ANDAMENTO') || s.includes('PARCIAL')) return 'text-warning';
-                        if (s.includes('ABERTO') || s.includes('SEM')) return 'text-danger';
-                        return 'text-info';
+                        if (s.includes('ESTOQUE') || s.includes('RECEBIDO') || s === 'COMPRADO') return 'badge-success';
+                        if (s.includes('ANDAMENTO') || s.includes('PARCIAL')) return 'badge-warning';
+                        if (s.includes('ABERTO') || s.includes('SEM')) return 'badge-danger';
+                        return 'badge-info';
                     };
 
                     const getProgressBar = (val) => {

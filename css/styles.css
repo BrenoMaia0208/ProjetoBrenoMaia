@@ -34,7 +34,7 @@
 }
 
 body {
-    background-color: var(--bg-primary);
+    background: radial-gradient(circle at 80% 20%, #151230 0%, #06060c 80%) !important;
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
@@ -599,29 +599,63 @@ button {
 }
 
 .data-table tbody tr {
-    transition: var(--transition-fast);
+    transition: all var(--transition-fast);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .data-table tbody tr:hover {
-    background: var(--bg-card-hover);
+    background: rgba(108, 99, 255, 0.06) !important;
+    cursor: pointer;
 }
 
 .data-table td {
+    padding: 16px;
     font-size: 0.9rem;
     color: var(--text-primary);
+    vertical-align: middle;
 }
 
+/* Badges de Status Modernos e Vibrantes (Pílulas) */
 .status-badge {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
     font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.text-success { color: var(--accent-success); background: rgba(16, 185, 129, 0.1); }
-.text-warning { color: var(--accent-warning); background: rgba(245, 158, 11, 0.1); }
-.text-danger { color: var(--accent-danger); background: rgba(239, 68, 68, 0.1); }
-.text-info { color: var(--accent-info); background: rgba(59, 130, 246, 0.1); }
+.badge-success { 
+    color: #10b981 !important; 
+    background: rgba(16, 185, 129, 0.12) !important; 
+    border: 1px solid rgba(16, 185, 129, 0.25) !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.badge-warning { 
+    color: #f59e0b !important; 
+    background: rgba(245, 158, 11, 0.12) !important; 
+    border: 1px solid rgba(245, 158, 11, 0.25) !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.badge-danger { 
+    color: #ef4444 !important; 
+    background: rgba(239, 68, 68, 0.12) !important; 
+    border: 1px solid rgba(239, 68, 68, 0.25) !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.badge-info { 
+    color: #3b82f6 !important; 
+    background: rgba(59, 130, 246, 0.12) !important; 
+    border: 1px solid rgba(59, 130, 246, 0.25) !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
 
 .table-footer {
     display: flex;
@@ -947,6 +981,8 @@ button {
 /* Micro-animações e Glow nos KPIs */
 .kpi-card {
     border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 3px solid transparent !important;
+    border-image: linear-gradient(90deg, #6c63ff, #a855f7) 1 !important;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, background-color 0.2s ease;
 }
 .kpi-card:hover {
