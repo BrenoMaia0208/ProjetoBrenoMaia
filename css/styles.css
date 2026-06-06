@@ -807,6 +807,7 @@ button {
     background-color: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--text-primary) !important;
+    z-index: 99 !important;
 }
 .choices__list--dropdown .choices__item, .choices__list[aria-expanded] .choices__item {
     color: var(--text-primary) !important;
@@ -893,6 +894,7 @@ button {
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: var(--radius-md) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    z-index: 99 !important;
 }
 
 .choices__list--dropdown .choices__item--selectable.is-highlighted {
