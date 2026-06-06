@@ -123,6 +123,11 @@
                     await this.logout();
                 });
             }
+
+            const emailEl = document.getElementById('user-email');
+            if (emailEl && session.user) {
+                emailEl.textContent = session.user.email;
+            }
             
             return session;
         },
