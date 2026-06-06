@@ -2,6 +2,8 @@
     'use strict';
 
     window.AuthService = {
+        listeners: [],
+
         init: function() {
             const isLoginPage = !!document.getElementById('login-form');
             const isDashboardPage = !!document.getElementById('dashboard-content');
@@ -98,17 +100,18 @@
             }
         },
 
-        checkSessionForLogin: async function() {
-            const { data: { session } } = await window.supabaseClient.auth.getSession();
+        checkSessionForLogin: function() {
+            const session = this.getSession();
             if (session) {
                 window.location.href = 'dashboard.html';
             } else {
-                document.getElementById('loading-overlay').classList.add('hidden');
+                const overlay = document.getElementById('loading-overlay');
+                if (overlay) overlay.classList.add('hidden');
             }
         },
 
-        checkSessionForDashboard: async function() {
-            const { data: { session } } = await window.supabaseClient.auth.getSession();
+        checkSessionForDashboard: function() {
+            const session = this.getSession();
             if (!session) {
                 window.location.href = 'index.html';
                 return null;
@@ -125,35 +128,68 @@
         },
 
         login: async function(email, password) {
-            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
             });
-            if (error) throw new Error(error.message === 'Invalid login credentials' ? 'Credenciais inválidas' : error.message);
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Credenciais inválidas');
+            }
+
+            const data = await response.json();
+            if (data.session) {
+                localStorage.setItem('sb-session', JSON.stringify(data.session));
+                this.triggerAuthStateChange('SIGNED_IN', data.session);
+            }
             return data;
         },
 
         register: async function(email, password) {
-            const { data, error } = await window.supabaseClient.auth.signUp({
-                email: email,
-                password: password,
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
             });
-            if (error) throw new Error(error.message);
-            return data;
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Erro ao registrar usuário');
+            }
+
+            return await response.json();
         },
 
         logout: async function() {
-            const { error } = await window.supabaseClient.auth.signOut();
-            if (error) console.error('Error logging out:', error);
+            localStorage.removeItem('sb-session');
+            this.triggerAuthStateChange('SIGNED_OUT', null);
         },
 
-        getUser: async function() {
-            const { data: { user } } = await window.supabaseClient.auth.getUser();
-            return user;
+        getUser: function() {
+            const session = this.getSession();
+            return session ? session.user : null;
+        },
+
+        getSession: function() {
+            try {
+                const sessionStr = localStorage.getItem('sb-session');
+                if (!sessionStr) return null;
+                return JSON.parse(sessionStr);
+            } catch (e) {
+                return null;
+            }
         },
 
         onAuthStateChange: function(callback) {
-            window.supabaseClient.auth.onAuthStateChange(callback);
+            this.listeners.push(callback);
+            const session = this.getSession();
+            callback(session ? 'SIGNED_IN' : 'SIGNED_OUT', session);
+        },
+
+        triggerAuthStateChange: function(event, session) {
+            this.listeners.forEach(cb => cb(event, session));
         }
     };
 })();

@@ -48,7 +48,7 @@
             console.log('🔎 Starting admin session check');
             try {
                 // Directly fetch session for debugging
-                const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+                const session = window.AuthService.getSession();
                 console.log('Supabase session object:', session);
                 await window.SupabaseService.checkAdminSession();
                 if (uploadBtn) uploadBtn.classList.remove('hidden');

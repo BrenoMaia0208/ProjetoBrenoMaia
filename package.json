@@ -1,0 +1,8 @@
+{
+  "name": "projeto-brenomaia",
+  "version": "1.0.0",
+  "description": "Painel de Vendas Seguro com API Serverless",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.8"
+  }
+}
