@@ -129,7 +129,12 @@
                     };
                     
                     const formatPercent = (val) => {
-                        return (val === null || val === undefined) ? '-' : `${val}%`;
+                        if (val === null || val === undefined) return '-';
+                        // Se o valor estiver em formato decimal (ex: 0.4114 em vez de 41.14)
+                        if (val > 0 && val <= 1) {
+                            return `${(val * 100).toFixed(2)}%`;
+                        }
+                        return `${parseFloat(val).toFixed(2)}%`;
                     };
                     
                     const formatDate = (val) => {
