@@ -34,7 +34,7 @@
 }
 
 body {
-    background: radial-gradient(circle at 80% 20%, #151230 0%, #06060c 80%) !important;
+    background: radial-gradient(circle at 80% 20%, #0b1742 0%, #030611 85%) !important;
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
