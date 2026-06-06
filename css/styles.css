@@ -344,9 +344,10 @@ button {
     padding: 24px;
 }
 
-/* Filters */
 .filters-container {
     padding: 20px 24px;
+    position: relative;
+    z-index: 10;
 }
 
 .filters-header {
@@ -908,11 +909,20 @@ button {
 }
 
 /* Glassmorphism e Efeitos Modernos */
-.card, .filters-container, .table-section {
+.card, .table-section {
     background: rgba(26, 26, 46, 0.45) !important;
     backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.filters-container {
+    background: rgba(26, 26, 46, 0.45) !important;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    position: relative !important;
+    z-index: 10 !important;
 }
 
 .modal-card {
