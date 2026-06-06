@@ -865,8 +865,13 @@ button {
     background: rgba(22, 22, 42, 0.6) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: var(--radius-sm) !important;
-    padding: 6px 12px !important;
+    padding: 10px 16px !important; /* Aumentado o padding interno para dar mais espaçamento */
+    min-height: 50px !important; /* Altura mínima aumentada para mais robustez */
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
     transition: all var(--transition-fast) !important;
+    cursor: pointer !important;
 }
 
 .choices.is-focused .choices__inner {
@@ -904,8 +909,16 @@ button {
 }
 
 .choices__placeholder {
-    opacity: 0.65 !important;
-    font-size: 0.85rem !important;
+    opacity: 0.75 !important;
+    font-size: 0.95rem !important; /* Fonte do placeholder ligeiramente maior */
+    color: var(--text-primary) !important;
+}
+
+.choices__input {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 0 !important;
 }
 
 /* Glassmorphism e Efeitos Modernos */
