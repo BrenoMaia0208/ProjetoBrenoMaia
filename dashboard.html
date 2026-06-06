@@ -29,6 +29,7 @@
                 <div class="user-info">
                     <i class="fa-solid fa-user"></i> <span id="user-email"></span>
                 </div>
+                <button id="create-user-btn" class="btn-outline hidden"><i class="fa-solid fa-user-plus"></i> Novo Usuário</button>
                 <button id="upload-btn" class="btn-outline hidden"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Planilha</button>
                 <button id="logout-btn" class="btn-danger"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
             </div>
@@ -225,6 +226,36 @@
             <div class="modal-footer">
                 <button id="upload-submit-btn" class="btn-primary w-100" disabled>Importar Dados</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div id="user-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Cadastrar Novo Usuário</h3>
+                <button id="user-close-btn" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="create-user-form">
+                <div class="modal-body">
+                    <div id="user-error" class="auth-error hidden" style="margin-bottom: 15px;"></div>
+                    <div class="input-group">
+                        <label for="new-user-email">E-mail</label>
+                        <input type="email" id="new-user-email" placeholder="email@empresa.com" required style="width:100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 12px; border-radius: var(--radius-sm); font-size: 0.95rem;">
+                    </div>
+                    <div class="input-group mt-3">
+                        <label for="new-user-password">Senha</label>
+                        <input type="password" id="new-user-password" placeholder="Mínimo 6 caracteres" required style="width:100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 12px; border-radius: var(--radius-sm); font-size: 0.95rem;">
+                    </div>
+                    <div class="input-group mt-3">
+                        <label for="new-user-password-confirm">Confirmar Senha</label>
+                        <input type="password" id="new-user-password-confirm" placeholder="Confirme a senha" required style="width:100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 12px; border-radius: var(--radius-sm); font-size: 0.95rem;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="new-user-submit-btn" class="btn-primary w-100">Criar Conta</button>
+                </div>
+            </form>
         </div>
     </div>
 

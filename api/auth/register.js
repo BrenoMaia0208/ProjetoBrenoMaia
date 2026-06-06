@@ -34,6 +34,30 @@ module.exports = async (req, res) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Verify Admin Authorization
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(403).json({ error: 'Acesso negado: Apenas administradores logados podem criar usuários.' });
+        }
+
+        const token = authHeader.substring(7);
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+
+        if (error || !user) {
+            return res.status(403).json({ error: 'Acesso negado: Sessão de usuário inválida ou expirada.' });
+        }
+
+        const userEmail = (user.email || '').toLowerCase().trim();
+        const allowedAdmins = ['contato.brenomaia@hotmail.com', 'brenomaia0208@gmail.com'];
+
+        if (!userEmail || !allowedAdmins.includes(userEmail)) {
+            return res.status(403).json({ error: 'Acesso negado: Apenas administradores podem criar novos usuários.' });
+        }
+    } catch (err) {
+        return res.status(403).json({ error: 'Erro de autorização: ' + err.message });
+    }
+
     try {
         const { data, error } = await supabase.auth.signUp({
             email,

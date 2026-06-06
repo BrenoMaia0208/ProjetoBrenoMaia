@@ -13,6 +13,7 @@
                 this.checkSessionForLogin();
             } else if (isDashboardPage) {
                 this.checkSessionForDashboard();
+                this.setupAdminUserHandlers();
             }
 
             this.onAuthStateChange((event, session) => {
@@ -195,6 +196,102 @@
 
         triggerAuthStateChange: function(event, session) {
             this.listeners.forEach(cb => cb(event, session));
+        },
+
+        setupAdminUserHandlers: function() {
+            const createUserBtn = document.getElementById('create-user-btn');
+            const userModal = document.getElementById('user-modal');
+            const userCloseBtn = document.getElementById('user-close-btn');
+            const createUserForm = document.getElementById('create-user-form');
+            const userError = document.getElementById('user-error');
+            const submitBtn = document.getElementById('new-user-submit-btn');
+
+            if (createUserBtn && userModal) {
+                this.checkAdminUserToggle();
+
+                createUserBtn.addEventListener('click', () => {
+                    userModal.classList.remove('hidden');
+                    if (createUserForm) createUserForm.reset();
+                    if (userError) userError.classList.add('hidden');
+                });
+            }
+
+            if (userCloseBtn && userModal) {
+                userCloseBtn.addEventListener('click', () => {
+                    userModal.classList.add('hidden');
+                });
+            }
+
+            if (createUserForm) {
+                createUserForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('new-user-email').value;
+                    const password = document.getElementById('new-user-password').value;
+                    const confirmPassword = document.getElementById('new-user-password-confirm').value;
+
+                    if (password !== confirmPassword) {
+                        if (userError) {
+                            userError.textContent = 'As senhas não coincidem.';
+                            userError.classList.remove('hidden');
+                        }
+                        return;
+                    }
+
+                    try {
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cadastrando...';
+                        }
+                        
+                        const session = this.getSession();
+                        const response = await fetch('/api/auth/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session.access_token}`
+                            },
+                            body: JSON.stringify({ email, password })
+                        });
+
+                        const resData = await response.json();
+                        if (!response.ok) {
+                            throw new Error(resData.error || 'Erro ao cadastrar usuário.');
+                        }
+
+                        if (userModal) userModal.classList.add('hidden');
+                        if (window.app && window.app.showNotification) {
+                            window.app.showNotification('Novo usuário cadastrado com sucesso!', 'success');
+                        }
+                    } catch (err) {
+                        if (userError) {
+                            userError.textContent = err.message;
+                            userError.classList.remove('hidden');
+                        }
+                    } finally {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Criar Conta';
+                        }
+                    }
+                });
+            }
+        },
+
+        checkAdminUserToggle: async function() {
+            const createUserBtn = document.getElementById('create-user-btn');
+            if (!createUserBtn) return;
+            try {
+                const session = this.getSession();
+                if (session && session.user) {
+                    const userEmail = (session.user.email || '').toLowerCase().trim();
+                    const allowedAdmins = ['contato.brenomaia@hotmail.com', 'brenomaia0208@gmail.com'];
+                    if (allowedAdmins.includes(userEmail)) {
+                        createUserBtn.classList.remove('hidden');
+                    }
+                }
+            } catch (e) {
+                createUserBtn.classList.add('hidden');
+            }
         }
     };
 })();

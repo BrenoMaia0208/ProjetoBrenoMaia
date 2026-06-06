@@ -388,6 +388,25 @@ button {
     transform: translateY(-1px);
 }
 
+#app-header #create-user-btn {
+    background: rgba(108, 99, 255, 0.06);
+    border: 1px solid rgba(108, 99, 255, 0.25);
+    color: #a8a5ff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 50px;
+    transition: all var(--transition-fast);
+}
+
+#app-header #create-user-btn:hover {
+    background: rgba(108, 99, 255, 0.15);
+    border-color: rgba(108, 99, 255, 0.45);
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(108, 99, 255, 0.25);
+    transform: translateY(-1px);
+}
+
 #app-header #logout-btn {
     background: rgba(239, 68, 68, 0.06);
     border: 1px solid rgba(239, 68, 68, 0.25);
