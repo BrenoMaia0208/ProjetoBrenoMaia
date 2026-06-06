@@ -851,12 +851,58 @@ button {
     cursor: pointer;
     transition: var(--transition-fast);
 }
-}
 
 .btn-quick-filter:hover, .btn-quick-filter.active {
     background: var(--bg-card-hover);
     color: var(--text-primary);
     border-color: var(--accent-primary);
+}
+
+/* Customização Premium das caixas de seleção (Choices.js) */
+.choices__inner {
+    background: rgba(22, 22, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 6px 12px !important;
+    transition: all var(--transition-fast) !important;
+}
+
+.choices.is-focused .choices__inner {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 12px rgba(108, 99, 255, 0.2) !important;
+    background: rgba(22, 22, 42, 0.8) !important;
+}
+
+.choices__list--multiple .choices__item {
+    background: var(--accent-gradient) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 3px 8px !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 6px rgba(108, 99, 255, 0.3) !important;
+}
+
+.choices__list--multiple .choices__item.is-button {
+    padding-right: 24px !important;
+}
+
+.choices__list--dropdown {
+    background: rgba(26, 26, 46, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background: var(--accent-gradient) !important;
+    color: white !important;
+}
+
+.choices__placeholder {
+    opacity: 0.65 !important;
+    font-size: 0.85rem !important;
 }
 
 /* Glassmorphism e Efeitos Modernos */
