@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
     res.setHeader(
         'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
     );
 
     if (req.method === 'OPTIONS') {
@@ -38,7 +38,17 @@ module.exports = async (req, res) => {
         return res.status(500).json({ error: 'Supabase credentials are not configured on Vercel' });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const authHeader = req.headers.authorization;
+    const clientOptions = {};
+    if (authHeader) {
+        clientOptions.global = {
+            headers: {
+                Authorization: authHeader
+            }
+        };
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey, clientOptions);
 
     try {
         const { data, error } = await supabase

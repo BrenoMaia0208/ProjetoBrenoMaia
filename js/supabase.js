@@ -4,7 +4,15 @@
     window.SupabaseService = {
         fetchPedidos: async function(filters = {}) {
             try {
-                const response = await fetch(`/api/pedidos?filters=${encodeURIComponent(JSON.stringify(filters))}`);
+                const session = this.getSession();
+                const headers = {};
+                if (session && session.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                }
+
+                const response = await fetch(`/api/pedidos?filters=${encodeURIComponent(JSON.stringify(filters))}`, {
+                    headers: headers
+                });
                 if (!response.ok) {
                     const err = await response.json();
                     throw new Error(err.error || 'Erro ao carregar pedidos.');
@@ -108,7 +116,15 @@
                 
                 const dbColName = colMap[column] || column;
 
-                const response = await fetch(`/api/pedidos/distinct?column=${dbColName}`);
+                const session = this.getSession();
+                const headers = {};
+                if (session && session.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                }
+
+                const response = await fetch(`/api/pedidos/distinct?column=${dbColName}`, {
+                    headers: headers
+                });
                 if (!response.ok) {
                     const err = await response.json();
                     throw new Error(err.error || 'Erro ao buscar valores distintos.');

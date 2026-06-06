@@ -22,7 +22,17 @@ module.exports = async (req, res) => {
         return res.status(500).json({ error: 'Supabase credentials are not configured on Vercel' });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const authHeader = req.headers.authorization;
+    const clientOptions = {};
+    if (authHeader) {
+        clientOptions.global = {
+            headers: {
+                Authorization: authHeader
+            }
+        };
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey, clientOptions);
 
     // Function to verify Admin Authorization using the Bearer Token
     const verifyAdmin = async () => {
