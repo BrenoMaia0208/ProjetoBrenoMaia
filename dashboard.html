@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestão de Pedidos de Venda</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo-dbd5cd89.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="lib/choices/choices.min.css" />
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dashboard-body">
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <div id="dashboard-content" class="hidden">
+        <header id="app-header">
+            <div class="header-brand" style="display: flex; align-items: center; gap: 12px;">
+                <img src="assets/logo-dbd5cd89.svg" alt="Logo da Empresa" style="height: 32px; width: auto;">
+                <h1>Painel de Vendas</h1>
+            </div>
+            <div class="header-actions">
+                <div class="user-info">
+                    <i class="fa-solid fa-user"></i> <span id="user-email"></span>
+                </div>
+                <button id="upload-btn" class="btn-outline hidden"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Planilha</button>
+                <button id="export-csv-btn" class="btn-outline"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
+                <button id="export-pdf-btn" class="btn-outline"><i class="fa-solid fa-file-pdf"></i> Exportar PDF</button>
+                <button id="logout-btn" class="btn-danger"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <!-- Filters Section -->
+            <section id="filters-section" class="filters-container card">
+                <div class="filters-header">
+                    <h3><i class="fa-solid fa-filter"></i> Filtros</h3>
+                    <div class="filters-actions">
+                        <span class="badge" id="active-filters-count" style="display: none;">0 ativos</span>
+                        <button id="clear-filters-btn" class="btn-text">Limpar</button>
+                    </div>
+                </div>
+
+                <div class="quick-filters mt-3 mb-3">
+                    <button class="btn-quick-filter" data-filter="atrasados"><i class="fa-solid fa-triangle-exclamation"></i> Atrasados</button>
+                    <button class="btn-quick-filter" data-filter="aguardando"><i class="fa-solid fa-clock"></i> Aguardando Compra</button>
+                    <button class="btn-quick-filter" data-filter="estoque"><i class="fa-solid fa-check"></i> Em Estoque</button>
+                </div>
+
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="filter-cidade">Cidade</label>
+                        <select id="filter-cidade" multiple></select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-grupo">Grupo</label>
+                        <select id="filter-grupo" multiple></select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-programa">Programa</label>
+                        <select id="filter-programa" multiple></select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-vendedor">Vendedor</label>
+                        <select id="filter-vendedor" multiple></select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-status-compra">Status Compra</label>
+                        <select id="filter-status-compra" multiple></select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-status-venda">Status Venda</label>
+                        <select id="filter-status-venda" multiple></select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-tipo-pedido">Tipo Pedido</label>
+                        <select id="filter-tipo-pedido" multiple></select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-entrega">Entrega</label>
+                        <select id="filter-entrega" multiple></select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KPIs Section -->
+            <section class="kpi-section">
+                <div class="kpi-grid-primary">
+                    <div class="kpi-card" data-kpi="total-pedidos">
+                        <div class="kpi-icon primary"><i class="fa-solid fa-boxes-stacked"></i></div>
+                        <div class="kpi-info">
+                            <h4>Total Pedidos</h4>
+                            <span id="kpi-total-pedidos" class="kpi-value">0</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card" data-kpi="valor-total">
+                        <div class="kpi-icon success"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <div class="kpi-info">
+                            <h4>Valor Total</h4>
+                            <span id="kpi-valor-total" class="kpi-value">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card" data-kpi="total-faturado">
+                        <div class="kpi-icon info"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                        <div class="kpi-info">
+                            <h4>Total Faturado</h4>
+                            <span id="kpi-total-faturado" class="kpi-value">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card" data-kpi="total-despachado">
+                        <div class="kpi-icon warning"><i class="fa-solid fa-truck-fast"></i></div>
+                        <div class="kpi-info">
+                            <h4>Total Despachado</h4>
+                            <span id="kpi-total-despachado" class="kpi-value">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kpi-grid-secondary mt-4">
+                    <div class="kpi-card mini" data-kpi="saldo-faturar">
+                        <div class="kpi-info">
+                            <h4>Saldo a Faturar</h4>
+                            <span id="kpi-saldo-faturar" class="kpi-value">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card mini" data-kpi="saldo-despacho">
+                        <div class="kpi-info">
+                            <h4>Saldo Despacho</h4>
+                            <span id="kpi-saldo-despacho" class="kpi-value">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card mini" data-kpi="total-solicitado">
+                        <div class="kpi-info">
+                            <h4>Total Solicitado</h4>
+                            <span id="kpi-total-solicitado" class="kpi-value">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- Table Section -->
+            <section class="table-section card">
+                <div class="table-header">
+                    <h3>Lista de Pedidos</h3>
+                    <div class="search-box global-search" style="margin: 0;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="global-search" placeholder="Pesquisar cliente ou pedido...">
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="data-table" class="data-table">
+                        <thead id="table-head">
+                            <tr>
+                                <th data-sort="nome">Nome <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="pedido">Pedido <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="cidade">Cidade <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="grupo">Grupo <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="vendedor">Vendedor <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="total_pedido">Total do Pedido <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="perc_disponivel">% Disp. <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="total_disponivel">Total Disponível <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="status_venda">Status Venda <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="status_compra">St. Compra <i class="fa-solid fa-sort"></i></th>
+                                <th data-sort="data_entrega">Entrega <i class="fa-solid fa-sort"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="table-footer">
+                    <div id="table-info" class="table-info">Mostrando 0 resultados</div>
+                    <div class="pagination-controls">
+                        <button id="prev-page-btn" class="btn-icon" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                        <span id="page-info">Página 1</span>
+                        <button id="next-page-btn" class="btn-icon" disabled><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Upload de Dados (Excel / CSV)</h3>
+                <button id="upload-close-btn" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="upload-dropzone" class="dropzone">
+                    <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+                    <p>Arraste e solte o arquivo Excel (.xlsx, .xls) ou CSV aqui</p>
+                    <p class="text-muted">ou clique para selecionar</p>
+                    <input type="file" id="upload-file-input" accept=".csv, .xlsx, .xls" class="hidden-input">
+                </div>
+                <div id="upload-filename" class="file-name-display text-muted mt-2"></div>
+                
+                <!-- Relatório de Validação -->
+                <div id="upload-validation-report" class="validation-report-container hidden mt-3" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; background: var(--bg-secondary);">
+                    <div class="report-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);"><i class="fa-solid fa-clipboard-check" style="color: var(--accent-primary); margin-right: 6px;"></i>Relatório de Validação</span>
+                        <span id="validation-status-badge" class="badge">Aguardando...</span>
+                    </div>
+                    <div id="validation-summary" class="validation-summary" style="font-size: 0.85rem; margin-bottom: 8px; line-height: 1.4; color: var(--text-secondary);"></div>
+                    <div id="validation-details-list" class="validation-details-list" style="max-height: 120px; overflow-y: auto; font-size: 0.8rem; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px; color: var(--text-muted);"></div>
+                </div>
+                
+                <div id="upload-progress" class="progress-container hidden mt-4">
+                    <div class="progress-bar">
+                        <div id="upload-progress-fill" class="progress-fill"></div>
+                    </div>
+                    <span id="upload-progress-text" class="progress-text">0%</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="upload-submit-btn" class="btn-primary w-100" disabled>Importar Dados</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.mini.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="lib/choices/choices.min.js"></script>
+    
+    <script>console.log('📦 Inicializando scripts...');</script>
+    <script src="js/supabase.js"></script>
+    <script>console.log('✅ supabase.js carregado');</script>
+    <script src="js/auth.js"></script>
+    <script>console.log('✅ auth.js carregado');</script>
+    <script src="js/filters.js"></script>
+    <script>console.log('✅ filters.js carregado');</script>
+    <script src="js/table.js"></script>
+    <script>console.log('✅ table.js carregado');</script>
+    <script src="js/dashboard.js"></script>
+    <script>console.log('✅ dashboard.js carregado');</script>
+    <script src="js/upload.js"></script>
+    <script>console.log('✅ upload.js carregado');</script>
+    <script src="js/export.js"></script>
+    <script>console.log('✅ export.js carregado');</script>
+    <script src="js/app.js"></script>
+    <script>console.log('✅ app.js carregado');</script>
+</body>
+</html>
