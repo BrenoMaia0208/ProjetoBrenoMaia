@@ -205,7 +205,15 @@
                         // Excel
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        
+                        // Busca a aba chamada 'MAPA DE PEDIDOS' ou usa a primeira como fallback
+                        let targetSheetName = workbook.SheetNames.find(name => name.trim().toUpperCase() === 'MAPA DE PEDIDOS');
+                        if (!targetSheetName) {
+                            console.warn('Aba "MAPA DE PEDIDOS" não encontrada. Usando a primeira aba disponível.');
+                            targetSheetName = workbook.SheetNames[0];
+                        }
+                        
+                        const sheet = workbook.Sheets[targetSheetName];
                         const jsonRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
                         
                         const parsed = this.parseExcelRaw(jsonRows);
