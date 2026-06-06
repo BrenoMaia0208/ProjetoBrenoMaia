@@ -148,6 +148,24 @@
                         return 'text-info';
                     };
 
+                    const getProgressBar = (val) => {
+                        if (val === null || val === undefined) return '-';
+                        let colorClass = 'progress-danger';
+                        if (val >= 75) {
+                            colorClass = 'progress-success';
+                        } else if (val >= 35) {
+                            colorClass = 'progress-warning';
+                        }
+                        return `
+                            <div class="table-progress-container" title="${val}% disponível">
+                                <span class="progress-text-value">${val}%</span>
+                                <div class="table-progress-bar">
+                                    <div class="table-progress-fill ${colorClass}" style="width: ${Math.min(val, 100)}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    };
+
                     tr.innerHTML = `
                         <td>${row.nome || '-'}</td>
                         <td>${row.pedido || '-'}</td>
@@ -155,7 +173,7 @@
                         <td>${row.grupo || '-'}</td>
                         <td>${row.vendedor || '-'}</td>
                         <td>${formatCurrency(row.total_pedido)}</td>
-                        <td>${formatPercent(row.perc_disponivel)}</td>
+                        <td>${getProgressBar(row.perc_disponivel)}</td>
                         <td>${formatCurrency(row.total_disponivel)}</td>
                         <td><span class="status-badge ${getStatusClass(row.status_venda)}">${row.status_venda || '-'}</span></td>
                         <td><span class="status-badge ${getStatusClass(row.status_compra)}">${row.status_compra || '-'}</span></td>

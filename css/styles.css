@@ -851,11 +851,72 @@ button {
     cursor: pointer;
     transition: var(--transition-fast);
 }
-.btn-quick-filter i {
-    margin-right: 0.3rem;
 }
+
 .btn-quick-filter:hover, .btn-quick-filter.active {
     background: var(--bg-card-hover);
     color: var(--text-primary);
     border-color: var(--accent-primary);
 }
+
+/* Glassmorphism e Efeitos Modernos */
+.card, .filters-container, .table-section {
+    background: rgba(26, 26, 46, 0.45) !important;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.modal-card {
+    background: rgba(26, 26, 46, 0.8) !important;
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Micro-animações e Glow nos KPIs */
+.kpi-card {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, background-color 0.2s ease;
+}
+.kpi-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), var(--shadow-glow);
+}
+
+/* Barra de progresso dentro das células da tabela */
+.table-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 100px;
+}
+.progress-text-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.table-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.table-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.progress-success {
+    background: linear-gradient(90deg, #10b981, #059669);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+.progress-warning {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+.progress-danger {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
