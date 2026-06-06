@@ -166,6 +166,7 @@
                         `;
                     };
 
+                    tr.className = 'main-row';
                     tr.innerHTML = `
                         <td>${row.nome || '-'}</td>
                         <td>${row.pedido || '-'}</td>
@@ -179,7 +180,63 @@
                         <td><span class="status-badge ${getStatusClass(row.status_compra)}">${row.status_compra || '-'}</span></td>
                         <td>${formatDate(row.data_entrega)}</td>
                     `;
+                    
+                    const detailsTr = document.createElement('tr');
+                    detailsTr.className = 'details-row hidden';
+                    detailsTr.innerHTML = `
+                        <td colspan="11">
+                            <div class="row-details-wrapper">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <strong>Total Despachado:</strong>
+                                        <span>${formatCurrency(row.total_despachado)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Saldo Despacho:</strong>
+                                        <span>${formatCurrency(row.saldo_despacho)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Dt. Últ. Fornecedor:</strong>
+                                        <span>${formatDate(row.dt_ult_fornecedor)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Total Faturado:</strong>
+                                        <span>${formatCurrency(row.total_faturado)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Saldo a Faturar:</strong>
+                                        <span>${formatCurrency(row.saldo_faturar)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Nº Empenho:</strong>
+                                        <span>${row.num_empenho || '-'}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Contato:</strong>
+                                        <span>${row.contato || '-'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                    
+                    tr.addEventListener('click', () => {
+                        const isHidden = detailsTr.classList.contains('hidden');
+                        
+                        // Fecha outros detalhes abertos apenas se formos abrir um novo
+                        if (isHidden) {
+                            document.querySelectorAll('.details-row').forEach(el => el.classList.add('hidden'));
+                            document.querySelectorAll('.main-row').forEach(el => el.classList.remove('expanded'));
+                            detailsTr.classList.remove('hidden');
+                            tr.classList.add('expanded');
+                        } else {
+                            detailsTr.classList.add('hidden');
+                            tr.classList.remove('expanded');
+                        }
+                    });
+                    
                     tbody.appendChild(tr);
+                    tbody.appendChild(detailsTr);
                 });
             }
 
