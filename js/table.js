@@ -196,6 +196,13 @@
                         `;
                     };
 
+                    let displayStatusVenda = row.status_venda || '-';
+                    const percDisp = parseFloat(row.perc_disponivel || 0);
+                    const percDesp = parseFloat(row.perc_despacho || 0);
+                    if (percDisp === 0 && percDesp === 0) {
+                        displayStatusVenda = 'Pedido em Aberto';
+                    }
+
                     tr.className = 'main-row';
                     tr.innerHTML = `
                         <td>${row.nome || '-'}</td>
@@ -206,7 +213,7 @@
                         <td>${formatCurrency(row.total_pedido)}</td>
                         <td>${getProgressBar(row.perc_disponivel)}</td>
                         <td>${formatCurrency(row.total_disponivel)}</td>
-                        <td><span class="status-badge ${getStatusClass(row.status_venda)}">${row.status_venda || '-'}</span></td>
+                        <td><span class="status-badge ${getStatusClass(displayStatusVenda)}">${displayStatusVenda}</span></td>
                         <td><span class="status-badge ${getStatusClass(row.status_compra)}">${row.status_compra || '-'}</span></td>
                         <td>${formatDate(row.data_entrega)}</td>
                     `;
