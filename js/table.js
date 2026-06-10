@@ -72,6 +72,11 @@
                         }
                     }
                 }
+                
+                // Garantir que a disponibilidade e o percentual nunca sejam negativos
+                if (row.total_disponivel < 0) row.total_disponivel = 0;
+                if (row.perc_disponivel < 0) row.perc_disponivel = 0;
+                
                 return row;
             });
             this.applyLocalFilters();
