@@ -248,7 +248,7 @@
                         <td>${row.pedido || '-'}</td>
                         <td>${row.cidade || '-'}</td>
                         <td>${row.grupo || '-'}</td>
-                        <td>${row.vendedor || '-'}</td>
+                        <td>${row.programa || '-'}</td>
                         <td>${formatCurrency(row.total_pedido)}</td>
                         <td>${getProgressBar(row.perc_disponivel)}</td>
                         <td>${formatCurrency(row.total_disponivel)}</td>
@@ -290,6 +290,10 @@
                                     <div class="detail-item">
                                         <strong>% Despachado:</strong>
                                         <span>${formatPercent(row.perc_despacho)}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Vendedor:</strong>
+                                        <span>${row.vendedor || '-'}</span>
                                     </div>
                                 </div>
                             </div>
