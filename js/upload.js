@@ -393,6 +393,9 @@
                     }
                 });
                 
+                if (row.perc_disponivel !== undefined && row.perc_disponivel < 0) row.perc_disponivel = 0;
+                if (row.total_disponivel !== undefined && row.total_disponivel < 0) row.total_disponivel = 0;
+
                 if (row.nome || row.pedido) {
                     rows.push(row);
                 }
@@ -493,6 +496,9 @@
                     }
                 });
                 
+                if (row.perc_disponivel !== undefined && row.perc_disponivel < 0) row.perc_disponivel = 0;
+                if (row.total_disponivel !== undefined && row.total_disponivel < 0) row.total_disponivel = 0;
+
                 if (row.nome || row.pedido) {
                     rows.push(row);
                 }
