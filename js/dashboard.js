@@ -6,6 +6,16 @@
             // Gráficos foram removidos do projeto
         },
 
+        renderSkeletons: function() {
+            const sumIds = ['kpi-total-pedidos', 'kpi-valor-total', 'kpi-total-faturado', 'kpi-total-despachado', 'kpi-saldo-faturar', 'kpi-saldo-despacho', 'kpi-total-solicitado'];
+            sumIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = '<span class="skeleton" style="width: 80px; height: 24px; vertical-align: middle;"></span>';
+                }
+            });
+        },
+
         update: function(data) {
             this.updateKPIs(data);
         },

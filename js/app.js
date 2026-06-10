@@ -18,6 +18,13 @@
 
     const loadData = async () => {
         try {
+            if (window.DashboardService && typeof window.DashboardService.renderSkeletons === 'function') {
+                window.DashboardService.renderSkeletons();
+            }
+            if (window.TableService && typeof window.TableService.renderSkeletons === 'function') {
+                window.TableService.renderSkeletons();
+            }
+
             const filters = window.FiltersService ? window.FiltersService.getActiveFilters() : {};
             const data = await window.SupabaseService.fetchPedidos(filters);
             if (window.DashboardService) window.DashboardService.update(data);
@@ -43,6 +50,32 @@
         }
 
         if (isDashboard) {
+            // Theme toggle initialization
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            if (themeToggleBtn) {
+                const icon = themeToggleBtn.querySelector('i');
+                if (document.body.classList.contains('light-theme')) {
+                    if (icon) {
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    }
+                }
+                themeToggleBtn.addEventListener('click', () => {
+                    document.body.classList.toggle('light-theme');
+                    const isLight = document.body.classList.contains('light-theme');
+                    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                    if (icon) {
+                        if (isLight) {
+                            icon.classList.remove('fa-moon');
+                            icon.classList.add('fa-sun');
+                        } else {
+                            icon.classList.remove('fa-sun');
+                            icon.classList.add('fa-moon');
+                        }
+                    }
+                });
+            }
+
             // Verify admin session to decide whether to show upload button
             const uploadBtn = document.getElementById('upload-btn');
             console.log('🔎 Starting admin session check');

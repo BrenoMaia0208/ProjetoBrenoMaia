@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="auth-body">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-theme');
+        }
+    </script>
     <div id="loading-overlay">
         <div class="spinner"></div>
     </div>

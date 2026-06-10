@@ -14,6 +14,31 @@
             this.setupPagination();
         },
 
+        renderSkeletons: function() {
+            const tbody = document.getElementById('table-body');
+            if (!tbody) return;
+
+            let html = '';
+            for (let i = 0; i < 6; i++) {
+                html += `
+                    <tr>
+                        <td><span class="skeleton" style="width: 100px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 60px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 50px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 70px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 50px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 90px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 60px; height: 18px;"></span></td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        },
+
         render: function(data) {
             this.allData = (data || []).map(row => {
                 const totalRomaneio = row.total_romaneio || 0;
