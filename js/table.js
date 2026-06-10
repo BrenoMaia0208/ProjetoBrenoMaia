@@ -41,23 +41,27 @@
 
         render: function(data) {
             this.allData = (data || []).map(row => {
-                // Se o status for "EM ESTOQUE", a disponibilidade é 100%
-                if (row.status_venda && row.status_venda.toUpperCase() === 'EM ESTOQUE') {
-                    row.perc_disponivel = 100;
-                    row.total_disponivel = row.total_pedido || 0;
-                } else {
-                    const totalRomaneio = row.total_romaneio || 0;
-                    const totalPedido = row.total_pedido || 0;
+                const totalPedido = row.total_pedido || 0;
+                const totalRomaneio = row.total_romaneio || 0;
+                const remainingBalance = Math.max(0, row.saldo_despacho !== null && row.saldo_despacho !== undefined ? row.saldo_despacho : totalPedido - (row.total_despachado || 0));
 
-                    // Se houver valor em romaneio, a disponibilidade real é exatamente o total em romaneio
+                // Se o status for "EM ESTOQUE", a disponibilidade é 100% do saldo restante
+                if (row.status_venda && row.status_venda.toUpperCase() === 'EM ESTOQUE') {
+                    row.total_disponivel = remainingBalance;
+                    row.perc_disponivel = totalPedido > 0 ? parseFloat(((row.total_disponivel / totalPedido) * 100).toFixed(2)) : 0;
+                } else {
+                    // Se houver valor em romaneio, a disponibilidade real é exatamente o total em romaneio (limitado ao saldo restante)
                     if (totalRomaneio > 0) {
-                        row.total_disponivel = totalRomaneio;
-                        row.perc_disponivel = totalPedido > 0 ? parseFloat(((totalRomaneio / totalPedido) * 100).toFixed(2)) : 0;
+                        row.total_disponivel = Math.min(totalRomaneio, remainingBalance);
+                        row.perc_disponivel = totalPedido > 0 ? parseFloat(((row.total_disponivel / totalPedido) * 100).toFixed(2)) : 0;
                     } else {
                         // Caso contrário, mantemos os valores originais da planilha/ERP
                         if (row.total_disponivel === null || row.total_disponivel === undefined) {
                             row.total_disponivel = 0;
                         }
+                        // Garante que o valor da planilha não seja maior que o saldo restante
+                        row.total_disponivel = Math.min(row.total_disponivel, remainingBalance);
+
                         if (row.perc_disponivel !== null && row.perc_disponivel !== undefined) {
                             const p = parseFloat(row.perc_disponivel);
                             // Check if stored as fraction (e.g. 0.4114)
@@ -68,6 +72,12 @@
                             }
                         } else {
                             row.perc_disponivel = 0;
+                        }
+
+                        // Garante que o percentual da planilha não supere a proporção restante
+                        const maxPerc = totalPedido > 0 ? parseFloat(((remainingBalance / totalPedido) * 100).toFixed(2)) : 0;
+                        if (row.perc_disponivel > maxPerc) {
+                            row.perc_disponivel = maxPerc;
                         }
                     }
                 }
