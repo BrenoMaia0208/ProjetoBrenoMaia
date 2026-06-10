@@ -83,12 +83,14 @@
 
             if (helpToggleBtn && helpDrawer) {
                 helpToggleBtn.addEventListener('click', () => {
+                    console.log('ℹ️ Opening help drawer...');
                     helpDrawer.classList.remove('hidden');
                 });
             }
 
             if (helpCloseBtn && helpDrawer) {
                 helpCloseBtn.addEventListener('click', () => {
+                    console.log('ℹ️ Closing help drawer...');
                     helpDrawer.classList.add('hidden');
                 });
             }
@@ -96,6 +98,7 @@
             if (helpDrawer) {
                 helpDrawer.addEventListener('click', (e) => {
                     if (e.target === helpDrawer) {
+                        console.log('ℹ️ Closing help drawer (outside click)...');
                         helpDrawer.classList.add('hidden');
                     }
                 });
