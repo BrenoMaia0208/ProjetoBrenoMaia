@@ -76,6 +76,31 @@
                 });
             }
 
+            // Help drawer initialization
+            const helpToggleBtn = document.getElementById('help-toggle-btn');
+            const helpDrawer = document.getElementById('help-drawer');
+            const helpCloseBtn = document.getElementById('help-close-btn');
+
+            if (helpToggleBtn && helpDrawer) {
+                helpToggleBtn.addEventListener('click', () => {
+                    helpDrawer.classList.remove('hidden');
+                });
+            }
+
+            if (helpCloseBtn && helpDrawer) {
+                helpCloseBtn.addEventListener('click', () => {
+                    helpDrawer.classList.add('hidden');
+                });
+            }
+
+            if (helpDrawer) {
+                helpDrawer.addEventListener('click', (e) => {
+                    if (e.target === helpDrawer) {
+                        helpDrawer.classList.add('hidden');
+                    }
+                });
+            }
+
             // Verify admin session to decide whether to show upload button
             const uploadBtn = document.getElementById('upload-btn');
             console.log('🔎 Starting admin session check');

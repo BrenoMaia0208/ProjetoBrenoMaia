@@ -1382,3 +1382,109 @@ body.light-theme .data-table th:hover {
 body.light-theme .row-details-wrapper {
     background: rgba(15, 23, 42, 0.02) !important;
 }
+
+/* ==========================================
+   Help Drawer Styles
+   ========================================== */
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 20, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 9500;
+    display: flex;
+    justify-content: flex-end;
+    transition: opacity var(--transition-normal);
+}
+
+.drawer-card {
+    background: var(--bg-card);
+    border-left: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 420px;
+    height: 100vh;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    animation: slideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideLeft {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.drawer-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.drawer-header h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+}
+
+.drawer-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.drawer-body h4 {
+    color: var(--accent-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+}
+
+.drawer-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.drawer-body li {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+.drawer-body li strong {
+    color: var(--accent-secondary);
+    font-weight: 600;
+}
+
+/* Light Theme Overrides for Drawer */
+body.light-theme .drawer-card {
+    background: #ffffff !important;
+    border-left: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: -10px 0 40px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme .drawer-header {
+    border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme .drawer-body h4 {
+    border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+}
+

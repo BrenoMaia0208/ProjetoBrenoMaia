@@ -35,6 +35,7 @@
                     <i class="fa-solid fa-user"></i> <span id="user-email"></span>
                 </div>
                 <button id="theme-toggle-btn" class="btn-icon" title="Alternar Tema"><i class="fa-solid fa-moon"></i></button>
+                <button id="help-toggle-btn" class="btn-icon" title="Guia do Painel"><i class="fa-solid fa-circle-question"></i></button>
                 <button id="create-user-btn" class="btn-outline hidden"><i class="fa-solid fa-user-plus"></i> Novo Usuário</button>
                 <button id="upload-btn" class="btn-outline hidden"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Planilha</button>
                 <button id="logout-btn" class="btn-danger"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
@@ -262,6 +263,43 @@
                     <button type="submit" id="new-user-submit-btn" class="btn-primary w-100">Criar Conta</button>
                 </div>
             </form>
+    </div>
+
+    <!-- Help Drawer -->
+    <div id="help-drawer" class="drawer-overlay hidden">
+        <div class="drawer-card">
+            <div class="drawer-header">
+                <h3><i class="fa-solid fa-circle-question" style="color: var(--accent-primary); margin-right: 8px;"></i>Guia do Painel</h3>
+                <button id="help-close-btn" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="drawer-body">
+                <h4>Indicadores (KPIs)</h4>
+                <ul>
+                    <li><strong>Total Pedidos:</strong> Quantidade total de pedidos de venda cadastrados sob os filtros ativos.</li>
+                    <li><strong>Valor Total:</strong> Faturamento total bruto acumulado nos pedidos filtrados.</li>
+                    <li><strong>Total Faturado:</strong> Valor total dos pedidos que já emitiram nota fiscal.</li>
+                    <li><strong>Total Despachado:</strong> Valor total dos pedidos que já foram enviados física ou digitalmente.</li>
+                    <li><strong>Saldo a Faturar:</strong> Montante restante que ainda aguarda emissão de nota.</li>
+                    <li><strong>Saldo Despacho:</strong> Saldo de pedidos faturados que ainda precisam ser expedidos.</li>
+                    <li><strong>Total Solicitado:</strong> Quantidade consolidada de insumos comprados/solicitados no ERP.</li>
+                </ul>
+                
+                <h4 class="mt-4">Termos da Tabela</h4>
+                <ul>
+                    <li><strong>% Disp. (Percentual Disponível):</strong> Proporção de mercadorias já em posse e prontas para entrega.</li>
+                    <li><strong>Total Disponível:</strong> Soma do que está em romaneio físico e o saldo final de despacho.</li>
+                    <li><strong>Status Venda:</strong> Fase comercial do pedido (ex: *Em aberto, Em Estoque, Parcial, Em Andamento*).</li>
+                    <li><strong>Status Compra:</strong> Estágio de abastecimento no ERP (ex: *Sem solicitação de compra, Comprado*).</li>
+                    <li><strong>Entrega:</strong> Data de compromisso final com o cliente.</li>
+                </ul>
+                
+                <h4 class="mt-4">Filtros Rápidos</h4>
+                <ul>
+                    <li><strong>Atrasados:</strong> Pedidos com prazo expirado que continuam com status comercial pendente.</li>
+                    <li><strong>Aguardando Compra:</strong> Pedidos que necessitam que o setor de compras faça a aquisição dos produtos.</li>
+                    <li><strong>Em Estoque:</strong> Pedidos cujas mercadorias já estão no galpão, prontas para faturamento/entrega.</li>
+                </ul>
+            </div>
         </div>
     </div>
 
