@@ -47,13 +47,12 @@
                     row.total_disponivel = row.total_pedido || 0;
                 } else {
                     const totalRomaneio = row.total_romaneio || 0;
-                    const saldoDespacho = row.saldo_despacho || 0;
                     const totalPedido = row.total_pedido || 0;
 
-                    // Se houver romaneio ou saldo de despacho, calculamos a disponibilidade real
-                    if (totalRomaneio > 0 || saldoDespacho > 0) {
-                        row.total_disponivel = totalRomaneio + saldoDespacho;
-                        row.perc_disponivel = totalPedido > 0 ? parseFloat(((row.total_disponivel / totalPedido) * 100).toFixed(2)) : 0;
+                    // Se houver valor em romaneio, a disponibilidade real é exatamente o total em romaneio
+                    if (totalRomaneio > 0) {
+                        row.total_disponivel = totalRomaneio;
+                        row.perc_disponivel = totalPedido > 0 ? parseFloat(((totalRomaneio / totalPedido) * 100).toFixed(2)) : 0;
                     } else {
                         // Caso contrário, mantemos os valores originais da planilha/ERP
                         if (row.total_disponivel === null || row.total_disponivel === undefined) {
