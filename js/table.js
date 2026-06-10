@@ -41,19 +41,36 @@
 
         render: function(data) {
             this.allData = (data || []).map(row => {
-                if (row.total_disponivel === null || row.total_disponivel === undefined) {
-                    row.total_disponivel = 0;
-                }
-                if (row.perc_disponivel !== null && row.perc_disponivel !== undefined) {
-                    const p = parseFloat(row.perc_disponivel);
-                    // Check if stored as fraction (e.g. 0.4114)
-                    if (p > 0 && p <= 1) {
-                        row.perc_disponivel = parseFloat((p * 100).toFixed(2));
-                    } else {
-                        row.perc_disponivel = parseFloat(p.toFixed(2));
-                    }
+                // Se o status for "EM ESTOQUE", a disponibilidade é 100%
+                if (row.status_venda && row.status_venda.toUpperCase() === 'EM ESTOQUE') {
+                    row.perc_disponivel = 100;
+                    row.total_disponivel = row.total_pedido || 0;
                 } else {
-                    row.perc_disponivel = 0;
+                    const totalRomaneio = row.total_romaneio || 0;
+                    const saldoDespacho = row.saldo_despacho || 0;
+                    const totalPedido = row.total_pedido || 0;
+
+                    // Se houver romaneio ou saldo de despacho, calculamos a disponibilidade real
+                    if (totalRomaneio > 0 || saldoDespacho > 0) {
+                        row.total_disponivel = totalRomaneio + saldoDespacho;
+                        row.perc_disponivel = totalPedido > 0 ? parseFloat(((row.total_disponivel / totalPedido) * 100).toFixed(2)) : 0;
+                    } else {
+                        // Caso contrário, mantemos os valores originais da planilha/ERP
+                        if (row.total_disponivel === null || row.total_disponivel === undefined) {
+                            row.total_disponivel = 0;
+                        }
+                        if (row.perc_disponivel !== null && row.perc_disponivel !== undefined) {
+                            const p = parseFloat(row.perc_disponivel);
+                            // Check if stored as fraction (e.g. 0.4114)
+                            if (p > 0 && p <= 1) {
+                                row.perc_disponivel = parseFloat((p * 100).toFixed(2));
+                            } else {
+                                row.perc_disponivel = parseFloat(p.toFixed(2));
+                            }
+                        } else {
+                            row.perc_disponivel = 0;
+                        }
+                    }
                 }
                 return row;
             });
