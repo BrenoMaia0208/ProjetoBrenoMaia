@@ -84,6 +84,7 @@
             if (helpToggleBtn && helpDrawer) {
                 helpToggleBtn.addEventListener('click', () => {
                     console.log('ℹ️ Opening help drawer...');
+                    helpDrawer.style.setProperty('display', 'flex', 'important');
                     helpDrawer.classList.remove('hidden');
                 });
             }
@@ -91,6 +92,7 @@
             if (helpCloseBtn && helpDrawer) {
                 helpCloseBtn.addEventListener('click', () => {
                     console.log('ℹ️ Closing help drawer...');
+                    helpDrawer.style.setProperty('display', 'none', 'important');
                     helpDrawer.classList.add('hidden');
                 });
             }
@@ -99,6 +101,7 @@
                 helpDrawer.addEventListener('click', (e) => {
                     if (e.target === helpDrawer) {
                         console.log('ℹ️ Closing help drawer (outside click)...');
+                        helpDrawer.style.setProperty('display', 'none', 'important');
                         helpDrawer.classList.add('hidden');
                     }
                 });
