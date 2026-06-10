@@ -44,13 +44,16 @@
             
             const formatCurrency = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             
+            // Alterar o título do card de valor total dinamicamente
+            const titleEl = document.getElementById('kpi-valor-total-title');
+            if (titleEl) {
+                titleEl.textContent = data.length === 1 ? 'Valor Total da Venda' : 'Valor Total das Vendas';
+            }
+
             this.animateValue('kpi-total-pedidos', 0, data.length, 1000, null);
             this.animateValue('kpi-valor-total', 0, sum(data, 'total_pedido'), 1000, formatCurrency);
             this.animateValue('kpi-total-faturado', 0, sum(data, 'total_faturado'), 1000, formatCurrency);
             this.animateValue('kpi-total-despachado', 0, sum(data, 'total_despachado'), 1000, formatCurrency);
-            this.animateValue('kpi-saldo-faturar', 0, sum(data, 'saldo_faturar'), 1000, formatCurrency);
-            this.animateValue('kpi-saldo-despacho', 0, sum(data, 'saldo_despacho'), 1000, formatCurrency);
-            this.animateValue('kpi-total-solicitado', 0, sum(data, 'total_solicitado'), 1000, formatCurrency);
         }
     };
 })();

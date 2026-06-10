@@ -29,6 +29,7 @@
                         <td><span class="skeleton" style="width: 70px; height: 18px;"></span></td>
                         <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
                         <td><span class="skeleton" style="width: 50px; height: 18px;"></span></td>
+                        <td><span class="skeleton" style="width: 50px; height: 18px;"></span></td>
                         <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
                         <td><span class="skeleton" style="width: 90px; height: 18px;"></span></td>
                         <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
@@ -85,6 +86,18 @@
                 // Garantir que a disponibilidade e o percentual nunca sejam negativos
                 if (row.total_disponivel < 0) row.total_disponivel = 0;
                 if (row.perc_disponivel < 0) row.perc_disponivel = 0;
+
+                if (row.perc_falteiro !== null && row.perc_falteiro !== undefined) {
+                    const p = parseFloat(row.perc_falteiro);
+                    if (p > 0 && p <= 1) {
+                        row.perc_falteiro = parseFloat((p * 100).toFixed(2));
+                    } else {
+                        row.perc_falteiro = parseFloat(p.toFixed(2));
+                    }
+                } else {
+                    row.perc_falteiro = 0;
+                }
+                if (row.perc_falteiro < 0) row.perc_falteiro = 0;
                 
                 return row;
             });
@@ -183,7 +196,7 @@
             tbody.innerHTML = '';
 
             if (pageData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 2rem;">Nenhum resultado encontrado.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 2rem;">Nenhum resultado encontrado.</td></tr>';
             } else {
                 pageData.forEach(row => {
                     const tr = document.createElement('tr');
@@ -251,6 +264,7 @@
                         <td>${row.programa || '-'}</td>
                         <td>${formatCurrency(row.total_pedido)}</td>
                         <td>${getProgressBar(row.perc_disponivel)}</td>
+                        <td>${formatPercent(row.perc_falteiro)}</td>
                         <td>${formatCurrency(row.total_disponivel)}</td>
                         <td><span class="status-badge ${getStatusClass(displayStatusVenda)}">${displayStatusVenda}</span></td>
                         <td><span class="status-badge ${getStatusClass(row.status_compra)}">${row.status_compra || '-'}</span></td>
@@ -260,7 +274,7 @@
                     const detailsTr = document.createElement('tr');
                     detailsTr.className = 'details-row hidden';
                     detailsTr.innerHTML = `
-                        <td colspan="11">
+                        <td colspan="12">
                             <div class="row-details-wrapper">
                                 <div class="details-grid">
                                     <div class="detail-item">
