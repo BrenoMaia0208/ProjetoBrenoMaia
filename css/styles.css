@@ -563,10 +563,11 @@ button {
     background: var(--accent-primary);
 }
 
-.kpi-card[data-kpi="valor-total"]:hover::before { background: var(--accent-success); }
-.kpi-card[data-kpi="total-faturado"]:hover::before { background: var(--accent-info); }
-.kpi-card[data-kpi="total-despachado"]:hover::before { background: var(--accent-warning); }
-.kpi-card[data-kpi="saldo-faturar"]:hover::before { background: var(--accent-danger); }
+.kpi-card[data-kpi="total-pedidos"]:hover::before { background: var(--accent-primary); }
+.kpi-card[data-kpi="total-vendas"]:hover::before { background: var(--accent-success); }
+.kpi-card[data-kpi="total-disponivel"]:hover::before { background: var(--accent-info); }
+.kpi-card[data-kpi="total-falteiro"]:hover::before { background: var(--accent-danger); }
+.kpi-card[data-kpi="total-entregue"]:hover::before { background: var(--accent-warning); }
 
 .kpi-icon {
     width: 48px;

@@ -7,7 +7,7 @@
         },
 
         renderSkeletons: function() {
-            const sumIds = ['kpi-total-pedidos', 'kpi-total-vendas', 'kpi-total-disponivel', 'kpi-total-falteiro'];
+            const sumIds = ['kpi-total-pedidos', 'kpi-total-vendas', 'kpi-total-entregue', 'kpi-total-disponivel', 'kpi-total-falteiro'];
             sumIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -67,11 +67,13 @@
             
             const totalPedidosCount = mappedData.length;
             const totalVendas = sum(mappedData, 'total_pedido');
+            const totalEntregue = sum(mappedData, 'total_despachado');
             const totalDisponivel = sum(mappedData, 'total_disponivel');
             const totalFalteiro = sum(mappedData, 'saldo_pedido');
 
             this.animateValue('kpi-total-pedidos', 0, totalPedidosCount, 1000, null);
             this.animateValue('kpi-total-vendas', 0, totalVendas, 1000, formatCurrency);
+            this.animateValue('kpi-total-entregue', 0, totalEntregue, 1000, formatCurrency);
             this.animateValue('kpi-total-disponivel', 0, totalDisponivel, 1000, formatCurrency);
             this.animateValue('kpi-total-falteiro', 0, totalFalteiro, 1000, formatCurrency);
         }
