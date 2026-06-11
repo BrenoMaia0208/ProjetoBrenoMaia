@@ -282,10 +282,6 @@
                                         <span>${formatCurrency(row.total_despachado)}</span>
                                     </div>
                                     <div class="detail-item">
-                                        <strong>Saldo Despacho:</strong>
-                                        <span>${formatCurrency(row.saldo_despacho)}</span>
-                                    </div>
-                                    <div class="detail-item">
                                         <strong>Dt. Últ. Fornecedor:</strong>
                                         <span>${formatDate(row.dt_ult_fornecedor)}</span>
                                     </div>
