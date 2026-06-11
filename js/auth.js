@@ -284,7 +284,7 @@
                 const session = this.getSession();
                 if (session && session.user) {
                     const userEmail = (session.user.email || '').toLowerCase().trim();
-                    const allowedAdmins = ['contato.brenomaia@hotmail.com', 'brenomaia0208@gmail.com'];
+                    const allowedAdmins = ['contato.brenomaia@hotmail.com', 'brenomaia0208@gmail.com', 'carlos.lucena@distribuidoraprovix.com'];
                     if (allowedAdmins.includes(userEmail)) {
                         createUserBtn.classList.remove('hidden');
                     }
