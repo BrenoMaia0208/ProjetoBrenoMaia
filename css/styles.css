@@ -519,8 +519,73 @@ button {
 /* KPIs */
 .kpi-grid-primary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 320px 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     gap: 20px;
+}
+
+.kpi-card.vertical {
+    grid-row: span 2;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 36px 24px;
+}
+
+.kpi-card.vertical .kpi-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    font-size: 2.25rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-card.vertical .kpi-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.kpi-card.vertical .kpi-value {
+    font-size: 3.25rem;
+    margin-top: 4px;
+}
+
+@media (max-width: 1024px) {
+    .kpi-grid-primary {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+    .kpi-card.vertical {
+        grid-row: auto;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        text-align: left;
+        padding: 24px;
+    }
+    .kpi-card.vertical .kpi-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+        margin-bottom: 0;
+        border-radius: var(--radius-sm);
+    }
+    .kpi-card.vertical .kpi-info {
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        gap: 12px;
+    }
+    .kpi-card.vertical .kpi-value {
+        font-size: 1.75rem;
+        margin-top: 0;
+    }
 }
 
 .kpi-grid-secondary {
