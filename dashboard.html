@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="lib/choices/choices.min.css" />
-    <link rel="stylesheet" href="css/styles.css?v=1.0.3">
+    <link rel="stylesheet" href="css/styles.css?v=1.0.4">
 </head>
 <body class="dashboard-body">
     <script>
@@ -51,12 +51,6 @@
                         <span class="badge" id="active-filters-count" style="display: none;">0 ativos</span>
                         <button id="clear-filters-btn" class="btn-text">Limpar</button>
                     </div>
-                </div>
-
-                <div class="quick-filters mt-3 mb-3">
-                    <button class="btn-quick-filter" data-filter="atrasados"><i class="fa-solid fa-triangle-exclamation"></i> Atrasados</button>
-                    <button class="btn-quick-filter" data-filter="aguardando"><i class="fa-solid fa-clock"></i> Aguardando Compra</button>
-                    <button class="btn-quick-filter" data-filter="estoque"><i class="fa-solid fa-check"></i> Em Estoque</button>
                 </div>
 
                 <div class="filters-grid">
@@ -277,13 +271,7 @@
                     <li><strong>Status Compra:</strong> Estágio de abastecimento no ERP (ex: *Sem solicitação de compra, Comprado*).</li>
                     <li><strong>Entrega:</strong> Data de compromisso final com o cliente.</li>
                 </ul>
-                
-                <h4 class="mt-4">Filtros Rápidos</h4>
-                <ul>
-                    <li><strong>Atrasados:</strong> Pedidos com prazo expirado que continuam com status comercial pendente.</li>
-                    <li><strong>Aguardando Compra:</strong> Pedidos que necessitam que o setor de compras faça a aquisição dos produtos.</li>
-                    <li><strong>Em Estoque:</strong> Pedidos cujas mercadorias já estão no galpão, prontas para faturamento/entrega.</li>
-                </ul>
+
             </div>
         </div>
     </div>
@@ -294,21 +282,21 @@
     <script src="lib/choices/choices.min.js"></script>
     
     <script>console.log('📦 Inicializando scripts...');</script>
-    <script src="js/supabase.js?v=1.0.3"></script>
+    <script src="js/supabase.js?v=1.0.4"></script>
     <script>console.log('✅ supabase.js carregado');</script>
-    <script src="js/auth.js?v=1.0.3"></script>
+    <script src="js/auth.js?v=1.0.4"></script>
     <script>console.log('✅ auth.js carregado');</script>
-    <script src="js/filters.js?v=1.0.3"></script>
+    <script src="js/filters.js?v=1.0.4"></script>
     <script>console.log('✅ filters.js carregado');</script>
-    <script src="js/table.js?v=1.0.3"></script>
+    <script src="js/table.js?v=1.0.4"></script>
     <script>console.log('✅ table.js carregado');</script>
-    <script src="js/dashboard.js?v=1.0.3"></script>
+    <script src="js/dashboard.js?v=1.0.4"></script>
     <script>console.log('✅ dashboard.js carregado');</script>
-    <script src="js/upload.js?v=1.0.3"></script>
+    <script src="js/upload.js?v=1.0.4"></script>
     <script>console.log('✅ upload.js carregado');</script>
-    <script src="js/export.js?v=1.0.3"></script>
+    <script src="js/export.js?v=1.0.4"></script>
     <script>console.log('✅ export.js carregado');</script>
-    <script src="js/app.js?v=1.0.3"></script>
+    <script src="js/app.js?v=1.0.4"></script>
     <script>console.log('✅ app.js carregado');</script>
 </body>
 </html>
