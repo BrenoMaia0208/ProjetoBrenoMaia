@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
     }
 
     // List of allowed columns to prevent SQL injection or querying unmapped tables
-    const allowedColumns = ['cidade', 'grupo', 'programa', 'vendedor', 'status_compra', 'status_venda', 'tipo_pedido', 'entrega_pedido'];
+    const allowedColumns = ['cidade', 'grupo', 'programa', 'vendedor', 'status_compra', 'status_venda', 'tipo_pedido', 'data_entrega'];
     if (!allowedColumns.includes(column)) {
         return res.status(400).json({ error: 'Coluna inválida' });
     }
