@@ -44,7 +44,7 @@
             this.allData = (data || []).map(row => {
                 const totalPedido = row.total_pedido || 0;
                 const totalRomaneio = row.total_romaneio || 0;
-                const remainingBalance = Math.max(0, row.saldo_despacho !== null && row.saldo_despacho !== undefined ? row.saldo_despacho : totalPedido - (row.total_despachado || 0));
+                const remainingBalance = Math.max(0, totalPedido - (row.total_despachado || 0));
 
                 // Se o status for "EM ESTOQUE", a disponibilidade é 100% do saldo restante
                 if (row.status_venda && row.status_venda.toUpperCase() === 'EM ESTOQUE') {
