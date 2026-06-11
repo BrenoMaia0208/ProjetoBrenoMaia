@@ -40,19 +40,40 @@
         },
 
         updateKPIs: function(data) {
+            const mappedData = (data || []).map(row => {
+                const r = { ...row };
+                const totalPedido = r.total_pedido || 0;
+                const totalRomaneio = r.total_romaneio || 0;
+                const remainingBalance = Math.max(0, r.saldo_despacho !== null && r.saldo_despacho !== undefined ? r.saldo_despacho : totalPedido - (r.total_despachado || 0));
+
+                if (r.status_venda && r.status_venda.toUpperCase() === 'EM ESTOQUE') {
+                    r.total_disponivel = remainingBalance;
+                } else {
+                    if (totalRomaneio > 0) {
+                        r.total_disponivel = Math.min(totalRomaneio, remainingBalance);
+                    } else {
+                        if (r.total_disponivel === null || r.total_disponivel === undefined) {
+                            r.total_disponivel = 0;
+                        }
+                        r.total_disponivel = Math.min(r.total_disponivel, remainingBalance);
+                    }
+                }
+                if (r.total_disponivel < 0) r.total_disponivel = 0;
+                return r;
+            });
+
             const sum = (arr, key) => arr.reduce((acc, curr) => acc + (Number(curr[key]) || 0), 0);
-            
             const formatCurrency = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             
-            const totalPedidosCount = data.length;
-            const totalVendas = sum(data, 'total_pedido');
-            const totalDisponivel = sum(data, 'total_disponivel');
-            const totalFalteiro = sum(data, 'saldo_pedido');
+            const totalPedidosCount = mappedData.length;
+            const totalVendas = sum(mappedData, 'total_pedido');
+            const totalDisponivel = sum(mappedData, 'total_disponivel');
+            const totalFalteiro = sum(mappedData, 'saldo_pedido') - totalDisponivel;
 
             this.animateValue('kpi-total-pedidos', 0, totalPedidosCount, 1000, null);
             this.animateValue('kpi-total-vendas', 0, totalVendas, 1000, formatCurrency);
             this.animateValue('kpi-total-disponivel', 0, totalDisponivel, 1000, formatCurrency);
-            this.animateValue('kpi-total-falteiro', 0, totalFalteiro, 1000, formatCurrency);
+            this.animateValue('kpi-total-falteiro', 0, Math.max(0, totalFalteiro), 1000, formatCurrency);
         }
     };
 })();
