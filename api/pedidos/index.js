@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
         }
 
         const userEmail = (user.email || '').toLowerCase().trim();
-        const allowedAdmins = ['contato.brenomaia@hotmail.com', 'brenomaia0208@gmail.com'];
+        const allowedAdmins = ['contato.brenomaia@hotmail.com', 'brenomaia0208@gmail.com', 'carlos.lucena@distribuidoraprovix.com'];
 
         if (!userEmail || !allowedAdmins.includes(userEmail)) {
             throw new Error('Acesso negado: Apenas administradores permitidos.');
