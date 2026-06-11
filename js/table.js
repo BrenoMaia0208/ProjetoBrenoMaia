@@ -294,6 +294,10 @@
                                         <span>${formatCurrency(row.saldo_faturar)}</span>
                                     </div>
                                     <div class="detail-item">
+                                        <strong>Valor em Falteiro:</strong>
+                                        <span>${formatCurrency(row.saldo_pedido)}</span>
+                                    </div>
+                                    <div class="detail-item">
                                         <strong>Nº Empenho:</strong>
                                         <span>${row.num_empenho || '-'}</span>
                                     </div>
