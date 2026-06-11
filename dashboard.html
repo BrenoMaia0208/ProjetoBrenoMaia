@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="lib/choices/choices.min.css" />
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=1.0.2">
 </head>
 <body class="dashboard-body">
     <script>
@@ -101,29 +101,29 @@
                     <div class="kpi-card" data-kpi="total-pedidos">
                         <div class="kpi-icon primary"><i class="fa-solid fa-boxes-stacked"></i></div>
                         <div class="kpi-info">
-                            <h4>Total Pedidos</h4>
+                            <h4>TOTAL DO PEDIDO</h4>
                             <span id="kpi-total-pedidos" class="kpi-value">0</span>
                         </div>
                     </div>
-                    <div class="kpi-card" data-kpi="valor-total">
+                    <div class="kpi-card" data-kpi="total-vendas">
                         <div class="kpi-icon success"><i class="fa-solid fa-sack-dollar"></i></div>
                         <div class="kpi-info">
-                            <h4 id="kpi-valor-total-title">Valor Total das Vendas</h4>
-                            <span id="kpi-valor-total" class="kpi-value">R$ 0,00</span>
+                            <h4>TOTAL DA(S) VENDA(S)</h4>
+                            <span id="kpi-total-vendas" class="kpi-value">R$ 0,00</span>
                         </div>
                     </div>
-                    <div class="kpi-card" data-kpi="total-faturado">
-                        <div class="kpi-icon info"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    <div class="kpi-card" data-kpi="total-disponivel">
+                        <div class="kpi-icon info"><i class="fa-solid fa-circle-check"></i></div>
                         <div class="kpi-info">
-                            <h4>Total Faturado</h4>
-                            <span id="kpi-total-faturado" class="kpi-value">R$ 0,00</span>
+                            <h4>TOTAL DISPONIVEL</h4>
+                            <span id="kpi-total-disponivel" class="kpi-value">R$ 0,00</span>
                         </div>
                     </div>
-                    <div class="kpi-card" data-kpi="total-despachado">
-                        <div class="kpi-icon warning"><i class="fa-solid fa-truck-fast"></i></div>
+                    <div class="kpi-card" data-kpi="total-falteiro">
+                        <div class="kpi-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
                         <div class="kpi-info">
-                            <h4>Total Despachado</h4>
-                            <span id="kpi-total-despachado" class="kpi-value">R$ 0,00</span>
+                            <h4>TOTAL EM FALTEIRO</h4>
+                            <span id="kpi-total-falteiro" class="kpi-value">R$ 0,00</span>
                         </div>
                     </div>
                 </div>
@@ -256,13 +256,10 @@
             <div class="drawer-body">
                 <h4>Indicadores (KPIs)</h4>
                 <ul>
-                    <li><strong>Total Pedidos:</strong> Quantidade total de pedidos de venda cadastrados sob os filtros ativos.</li>
-                    <li><strong>Valor Total:</strong> Faturamento total bruto acumulado nos pedidos filtrados.</li>
-                    <li><strong>Total Faturado:</strong> Valor total dos pedidos que já emitiram nota fiscal.</li>
-                    <li><strong>Total Despachado:</strong> Valor total dos pedidos que já foram enviados física ou digitalmente.</li>
-                    <li><strong>Saldo a Faturar:</strong> Montante restante que ainda aguarda emissão de nota.</li>
-                    <li><strong>Saldo Despacho:</strong> Saldo de pedidos faturados que ainda precisam ser expedidos.</li>
-                    <li><strong>Total Solicitado:</strong> Quantidade consolidada de insumos comprados/solicitados no ERP.</li>
+                    <li><strong>TOTAL DO PEDIDO:</strong> Quantidade total de pedidos de venda cadastrados sob os filtros ativos.</li>
+                    <li><strong>TOTAL DA(S) VENDA(S):</strong> Faturamento total bruto acumulado nos pedidos filtrados.</li>
+                    <li><strong>TOTAL DISPONIVEL:</strong> Valor total dos pedidos que já estão disponíveis em estoque ou romaneios.</li>
+                    <li><strong>TOTAL EM FALTEIRO:</strong> Diferença entre o saldo restante do pedido e o valor total do pedido.</li>
                 </ul>
                 
                 <h4 class="mt-4">Termos da Tabela</h4>
@@ -290,21 +287,21 @@
     <script src="lib/choices/choices.min.js"></script>
     
     <script>console.log('📦 Inicializando scripts...');</script>
-    <script src="js/supabase.js?v=1.0.1"></script>
+    <script src="js/supabase.js?v=1.0.2"></script>
     <script>console.log('✅ supabase.js carregado');</script>
-    <script src="js/auth.js?v=1.0.1"></script>
+    <script src="js/auth.js?v=1.0.2"></script>
     <script>console.log('✅ auth.js carregado');</script>
-    <script src="js/filters.js?v=1.0.1"></script>
+    <script src="js/filters.js?v=1.0.2"></script>
     <script>console.log('✅ filters.js carregado');</script>
-    <script src="js/table.js?v=1.0.1"></script>
+    <script src="js/table.js?v=1.0.2"></script>
     <script>console.log('✅ table.js carregado');</script>
-    <script src="js/dashboard.js?v=1.0.1"></script>
+    <script src="js/dashboard.js?v=1.0.2"></script>
     <script>console.log('✅ dashboard.js carregado');</script>
-    <script src="js/upload.js?v=1.0.1"></script>
+    <script src="js/upload.js?v=1.0.2"></script>
     <script>console.log('✅ upload.js carregado');</script>
-    <script src="js/export.js?v=1.0.1"></script>
+    <script src="js/export.js?v=1.0.2"></script>
     <script>console.log('✅ export.js carregado');</script>
-    <script src="js/app.js?v=1.0.1"></script>
+    <script src="js/app.js?v=1.0.2"></script>
     <script>console.log('✅ app.js carregado');</script>
 </body>
 </html>

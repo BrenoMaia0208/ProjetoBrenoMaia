@@ -7,7 +7,7 @@
         },
 
         renderSkeletons: function() {
-            const sumIds = ['kpi-total-pedidos', 'kpi-valor-total', 'kpi-total-faturado', 'kpi-total-despachado', 'kpi-saldo-faturar', 'kpi-saldo-despacho', 'kpi-total-solicitado'];
+            const sumIds = ['kpi-total-pedidos', 'kpi-total-vendas', 'kpi-total-disponivel', 'kpi-total-falteiro'];
             sumIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -44,16 +44,15 @@
             
             const formatCurrency = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             
-            // Alterar o título do card de valor total dinamicamente
-            const titleEl = document.getElementById('kpi-valor-total-title');
-            if (titleEl) {
-                titleEl.textContent = data.length === 1 ? 'Valor Total da Venda' : 'Valor Total das Vendas';
-            }
+            const totalPedidosCount = data.length;
+            const totalVendas = sum(data, 'total_pedido');
+            const totalDisponivel = sum(data, 'total_disponivel');
+            const totalFalteiro = sum(data, 'saldo_pedido') - sum(data, 'total_pedido');
 
-            this.animateValue('kpi-total-pedidos', 0, data.length, 1000, null);
-            this.animateValue('kpi-valor-total', 0, sum(data, 'total_pedido'), 1000, formatCurrency);
-            this.animateValue('kpi-total-faturado', 0, sum(data, 'total_faturado'), 1000, formatCurrency);
-            this.animateValue('kpi-total-despachado', 0, sum(data, 'total_despachado'), 1000, formatCurrency);
+            this.animateValue('kpi-total-pedidos', 0, totalPedidosCount, 1000, null);
+            this.animateValue('kpi-total-vendas', 0, totalVendas, 1000, formatCurrency);
+            this.animateValue('kpi-total-disponivel', 0, totalDisponivel, 1000, formatCurrency);
+            this.animateValue('kpi-total-falteiro', 0, totalFalteiro, 1000, formatCurrency);
         }
     };
 })();
