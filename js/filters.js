@@ -21,7 +21,7 @@
                 { id: 'filter-status-compra', col: 'status_compra', label: 'Status Compra' },
                 { id: 'filter-status-venda', col: 'status_venda', label: 'Status Venda' },
                 { id: 'filter-tipo-pedido', col: 'tipo_pedido', label: 'Tipos' },
-                { id: 'filter-entrega', col: 'entrega_pedido', label: 'Entregas' }
+                { id: 'filter-entrega', col: 'data_entrega', label: 'Previsões de Entrega' }
             ];
 
             for (const config of filterConfigs) {
@@ -33,7 +33,16 @@
                 values.forEach(val => {
                     const option = document.createElement('option');
                     option.value = val;
-                    option.textContent = val;
+                    if (config.col === 'data_entrega' && val) {
+                        const parts = val.split('-');
+                        if (parts.length === 3) {
+                            option.textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                        } else {
+                            option.textContent = val;
+                        }
+                    } else {
+                        option.textContent = val || '-';
+                    }
                     select.appendChild(option);
                 });
 

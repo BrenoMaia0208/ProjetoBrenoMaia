@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
                 'status-compra': 'status_compra',
                 'status-venda': 'status_venda',
                 'tipo-pedido': 'tipo_pedido',
-                'entrega': 'entrega_pedido'
+                'entrega': 'data_entrega'
             };
 
             for (const [filterKey, dbCol] of Object.entries(arrayCols)) {
