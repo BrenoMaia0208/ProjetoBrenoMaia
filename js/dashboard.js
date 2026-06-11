@@ -47,7 +47,7 @@
             const totalPedidosCount = data.length;
             const totalVendas = sum(data, 'total_pedido');
             const totalDisponivel = sum(data, 'total_disponivel');
-            const totalFalteiro = sum(data, 'saldo_pedido') - sum(data, 'total_pedido');
+            const totalFalteiro = sum(data, 'saldo_pedido');
 
             this.animateValue('kpi-total-pedidos', 0, totalPedidosCount, 1000, null);
             this.animateValue('kpi-total-vendas', 0, totalVendas, 1000, formatCurrency);
