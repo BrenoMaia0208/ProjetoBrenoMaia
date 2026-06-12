@@ -42,23 +42,9 @@
         updateKPIs: function(data) {
             const mappedData = (data || []).map(row => {
                 const r = { ...row };
-                const totalPedido = r.total_pedido || 0;
-                const totalRomaneio = r.total_romaneio || 0;
-                const remainingBalance = Math.max(0, totalPedido - (r.total_despachado || 0));
-
-                if (r.status_venda && r.status_venda.toUpperCase() === 'EM ESTOQUE') {
-                    r.total_disponivel = remainingBalance;
-                } else {
-                    if (totalRomaneio > 0) {
-                        r.total_disponivel = Math.min(totalRomaneio, remainingBalance);
-                    } else {
-                        if (r.total_disponivel === null || r.total_disponivel === undefined) {
-                            r.total_disponivel = 0;
-                        }
-                        r.total_disponivel = Math.min(r.total_disponivel, remainingBalance);
-                    }
+                if (r.total_disponivel === null || r.total_disponivel === undefined) {
+                    r.total_disponivel = 0;
                 }
-                if (r.total_disponivel < 0) r.total_disponivel = 0;
                 return r;
             });
 
