@@ -116,6 +116,24 @@
                 
                 const dbColName = colMap[column] || column;
 
+                // For status_venda, distinct values must match displayStatusVenda
+                if (dbColName === 'status_venda') {
+                    const allData = await this.fetchPedidos({});
+                    const uniqueStatuses = new Set();
+                    allData.forEach(row => {
+                        let displayStatusVenda = row.status_venda || '-';
+                        const percDisp = parseFloat(row.perc_disponivel || 0);
+                        const percDesp = parseFloat(row.perc_despacho || 0);
+                        if (percDisp === 0 && percDesp === 0 && displayStatusVenda.toUpperCase() !== 'EM ESTOQUE') {
+                            displayStatusVenda = 'Pedido em Aberto';
+                        }
+                        if (displayStatusVenda && displayStatusVenda !== '-') {
+                            uniqueStatuses.add(displayStatusVenda);
+                        }
+                    });
+                    return Array.from(uniqueStatuses).sort();
+                }
+
                 const session = this.getSession();
                 const headers = {};
                 if (session && session.access_token) {

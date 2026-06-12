@@ -87,7 +87,6 @@ module.exports = async (req, res) => {
                 'programa': 'programa',
                 'vendedor': 'vendedor',
                 'status-compra': 'status_compra',
-                'status-venda': 'status_venda',
                 'tipo-pedido': 'tipo_pedido',
                 'entrega': 'data_entrega'
             };
@@ -111,8 +110,22 @@ module.exports = async (req, res) => {
                 }
             }
 
-            const { data, error } = await query;
+            let { data, error } = await query;
             if (error) throw error;
+
+            // Apply status_venda filtering in JavaScript using displayStatusVenda logic
+            if (data && filters['status-venda'] && filters['status-venda'].length > 0) {
+                const selectedStatuses = filters['status-venda'];
+                data = data.filter(row => {
+                    let displayStatusVenda = row.status_venda || '-';
+                    const percDisp = parseFloat(row.perc_disponivel || 0);
+                    const percDesp = parseFloat(row.perc_despacho || 0);
+                    if (percDisp === 0 && percDesp === 0 && displayStatusVenda.toUpperCase() !== 'EM ESTOQUE') {
+                        displayStatusVenda = 'Pedido em Aberto';
+                    }
+                    return selectedStatuses.includes(displayStatusVenda);
+                });
+            }
 
             return res.status(200).json(data || []);
         } catch (err) {
