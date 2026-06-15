@@ -77,7 +77,11 @@
 
             filterIds.forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.addEventListener('change', triggerChange);
+                if (el) {
+                    el.addEventListener('change', triggerChange);
+                    el.addEventListener('addItem', triggerChange);
+                    el.addEventListener('removeItem', triggerChange);
+                }
             });
 
             const searchInput = document.getElementById('global-search');
