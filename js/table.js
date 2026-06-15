@@ -226,11 +226,6 @@
                     };
 
                     let displayStatusVenda = row.status_venda || '-';
-                    const percDisp = parseFloat(row.perc_disponivel || 0);
-                    const percDesp = parseFloat(row.perc_despacho || 0);
-                    if (percDisp === 0 && percDesp === 0 && displayStatusVenda.toUpperCase() !== 'EM ESTOQUE') {
-                        displayStatusVenda = 'Pedido em Aberto';
-                    }
 
                     tr.className = 'main-row';
                     tr.innerHTML = `
