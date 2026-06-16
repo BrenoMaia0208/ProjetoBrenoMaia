@@ -45,12 +45,16 @@
                 const totalRomaneio = row.total_romaneio || 0;
                 const remainingBalance = Math.max(0, totalPedido - (row.total_despachado || 0));
 
-                const saldoFaturar = row.saldo_faturar || 0;
-                row.total_disponivel = (row.total_disponivel || 0) + saldoFaturar;
-                
-                if (totalPedido > 0) {
-                    row.perc_disponivel = parseFloat(((row.total_disponivel / totalPedido) * 100).toFixed(2));
-                    if (row.perc_disponivel > 100) row.perc_disponivel = 100;
+                if (row.total_disponivel === null || row.total_disponivel === undefined) {
+                    row.total_disponivel = 0;
+                }
+                if (row.perc_disponivel !== null && row.perc_disponivel !== undefined) {
+                    const p = parseFloat(row.perc_disponivel);
+                    if (p > 0 && p <= 1) {
+                        row.perc_disponivel = parseFloat((p * 100).toFixed(2));
+                    } else {
+                        row.perc_disponivel = parseFloat(p.toFixed(2));
+                    }
                 } else {
                     row.perc_disponivel = 0;
                 }

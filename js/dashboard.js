@@ -42,8 +42,9 @@
         updateKPIs: function(data) {
             const mappedData = (data || []).map(row => {
                 const r = { ...row };
-                const saldoFaturar = r.saldo_faturar || 0;
-                r.total_disponivel = (r.total_disponivel || 0) + saldoFaturar;
+                if (r.total_disponivel === null || r.total_disponivel === undefined) {
+                    r.total_disponivel = 0;
+                }
                 return r;
             });
 
