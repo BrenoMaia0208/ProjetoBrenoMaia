@@ -350,8 +350,8 @@
                 if (str.includes('/')) {
                     const parts = str.split(' ')[0].split('/');
                     if (parts.length === 3) {
-                        const month = parts[0].padStart(2, '0');
-                        const day = parts[1].padStart(2, '0');
+                        const day = parts[0].padStart(2, '0');
+                        const month = parts[1].padStart(2, '0');
                         const year = parts[2];
                         return `${year}-${month}-${day}`;
                     }
@@ -460,8 +460,8 @@
                 if (val.includes('/')) {
                     const parts = val.split(' ')[0].split('/');
                     if (parts.length === 3) {
-                        const month = parts[0].padStart(2, '0');
-                        const day = parts[1].padStart(2, '0');
+                        const day = parts[0].padStart(2, '0');
+                        const month = parts[1].padStart(2, '0');
                         const year = parts[2];
                         return `${year}-${month}-${day}`;
                     }
