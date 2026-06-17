@@ -36,6 +36,7 @@
                 </div>
                 <button id="theme-toggle-btn" class="btn-icon" title="Alternar Tema"><i class="fa-solid fa-moon"></i></button>
                 <button id="help-toggle-btn" class="btn-icon" title="Guia do Painel"><i class="fa-solid fa-circle-question"></i></button>
+                <button id="weekly-plan-btn" class="btn-outline"><i class="fa-solid fa-calendar-week"></i> Planejamento Semanal</button>
                 <button id="create-user-btn" class="btn-outline hidden"><i class="fa-solid fa-user-plus"></i> Novo Usuário</button>
                 <button id="upload-btn" class="btn-outline hidden"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Planilha</button>
                 <button id="logout-btn" class="btn-danger"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
@@ -275,6 +276,38 @@
         </div>
     </div>
 
+    <!-- Weekly Plan Modal -->
+    <div id="weekly-plan-modal" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 90%; width: 1100px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-calendar-week" style="color: var(--accent-primary); margin-right: 8px;"></i>PLANEJAMENTO DE ENTREGA SEMANAL</h3>
+                <span id="weekly-plan-dates" class="badge" style="margin-left: 12px; background: rgba(108, 99, 255, 0.15); color: var(--accent-primary);">15/06 a 19/06</span>
+                <button id="weekly-plan-close-btn" class="btn-icon" style="margin-left: auto;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Dia</th>
+                                <th>Previsão</th>
+                                <th>Cidade</th>
+                                <th>Pedido</th>
+                                <th>Programa</th>
+                                <th>Grupo</th>
+                                <th>Valor</th>
+                                <th style="width: 150px; text-align: center;">Situação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weekly-plan-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.mini.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -295,6 +328,8 @@
     <script>console.log('✅ upload.js carregado');</script>
     <script src="js/export.js?v=1.0.7"></script>
     <script>console.log('✅ export.js carregado');</script>
+    <script src="js/weekly_plan.js?v=1.0.7"></script>
+    <script>console.log('✅ weekly_plan.js carregado');</script>
     <script src="js/app.js?v=1.0.7"></script>
     <script>console.log('✅ app.js carregado');</script>
 </body>

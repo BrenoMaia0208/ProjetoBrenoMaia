@@ -29,6 +29,7 @@
             const data = await window.SupabaseService.fetchPedidos(filters);
             if (window.DashboardService) window.DashboardService.update(data);
             if (window.TableService) window.TableService.render(data);
+            if (window.WeeklyPlanService) window.WeeklyPlanService.update(data);
         } catch (e) {
             console.error('Error loading data', e);
             showNotification('Erro ao carregar dados', 'error');
@@ -142,6 +143,10 @@
             if (window.ExportService) {
                 window.ExportService.init();
             } else { console.warn('ExportService not available'); }
+
+            if (window.WeeklyPlanService) {
+                window.WeeklyPlanService.init();
+            } else { console.warn('WeeklyPlanService not available'); }
 
             await loadData();
 
