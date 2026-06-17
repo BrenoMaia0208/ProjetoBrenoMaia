@@ -10,7 +10,7 @@
                     headers['Authorization'] = `Bearer ${session.access_token}`;
                 }
 
-                const response = await fetch(`/api/pedidos?filters=${encodeURIComponent(JSON.stringify(filters))}`, {
+                const response = await fetch(`/api/pedidos?filters=${encodeURIComponent(JSON.stringify(filters))}&_t=${Date.now()}`, {
                     headers: headers
                 });
                 if (!response.ok) {

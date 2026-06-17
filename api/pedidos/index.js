@@ -167,11 +167,16 @@ module.exports = async (req, res) => {
             if (pedido) {
                 // Em vez de deletar o registro do banco de dados (que removeria do dashboard),
                 // nós apenas definimos a data_entrega como null, retirando do planejamento semanal
-                const { error } = await supabase
-                    .from('pedidos')
-                    .update({ data_entrega: null })
-                    .eq('pedido', pedido);
+                let query = supabase.from('pedidos').update({ data_entrega: null });
+                
+                // Se for numérico, tenta dar o match como número, caso contrário como string
+                if (!isNaN(pedido) && pedido.trim() !== '') {
+                    query = query.eq('pedido', Number(pedido));
+                } else {
+                    query = query.eq('pedido', pedido);
+                }
 
+                const { error } = await query;
                 if (error) throw error;
 
                 return res.status(200).json({ success: true, message: `Pedido ${pedido} desmarcado do planejamento semanal.` });
@@ -268,11 +273,15 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ error: 'Número do pedido é obrigatório para atualização.' });
             }
 
-            const { data, error } = await supabase
-                .from('pedidos')
-                .update({ data_entrega: data_entrega || null })
-                .eq('pedido', pedido);
+            let query = supabase.from('pedidos').update({ data_entrega: data_entrega || null });
+            
+            if (!isNaN(pedido) && String(pedido).trim() !== '') {
+                query = query.eq('pedido', Number(pedido));
+            } else {
+                query = query.eq('pedido', pedido);
+            }
 
+            const { error } = await query;
             if (error) throw error;
 
             return res.status(200).json({ success: true, message: 'Previsão de entrega atualizada com sucesso.' });
