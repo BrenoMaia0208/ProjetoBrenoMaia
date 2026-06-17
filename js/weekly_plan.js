@@ -181,6 +181,7 @@
                                     <span class="delivery-cidade" title="${p.cidade || 'Não informada'}">
                                         <i class="fa-solid fa-location-dot" style="color: var(--accent-primary); margin-right: 6px;"></i>${p.cidade || 'Não informada'}
                                     </span>
+                                    <button class="btn-delete-delivery" data-pedido="${p.pedido}" title="Remover do Planejamento" style="background: transparent; color: #ef4444; border: none; cursor: pointer; padding: 4px; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-trash-can"></i></button>
                                 </div>
                                 <div class="weekly-delivery-details">
                                     <div class="detail-line"><span>Programa:</span> <strong>${p.programa || '-'}</strong></div>
@@ -231,6 +232,43 @@
                             if (window.app && window.app.showNotification) {
                                 window.app.showNotification(`Entrega para ${day.name} marcada como Pendente.`, 'info');
                             }
+                        }
+                    });
+                });
+
+                // Add event listeners for delete button
+                card.querySelectorAll('.btn-delete-delivery').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const pedidoId = btn.getAttribute('data-pedido');
+                        
+                        if (!confirm(`Deseja realmente remover o pedido ${pedidoId} do planejamento?`)) {
+                            return;
+                        }
+                        
+                        try {
+                            btn.disabled = true;
+                            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                            
+                            await window.SupabaseService.deletePedido(pedidoId);
+                            
+                            if (window.app && window.app.showNotification) {
+                                window.app.showNotification(`Pedido ${pedidoId} removido do planejamento!`, 'success');
+                            }
+                            
+                            // Reload data and update UI
+                            if (window.app && window.app.loadData) {
+                                await window.app.loadData();
+                                // Re-render current plan since the service has updated weeklyPedidos
+                                this.renderPlan();
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            if (window.app && window.app.showNotification) {
+                                window.app.showNotification(err.message || 'Erro ao remover pedido.', 'error');
+                            }
+                            btn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                            btn.disabled = false;
                         }
                     });
                 });

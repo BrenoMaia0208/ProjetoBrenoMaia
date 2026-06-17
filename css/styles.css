@@ -1751,6 +1751,11 @@ body.light-theme .drawer-body h4 {
     background: rgba(16, 185, 129, 0.08) !important;
 }
 
+.btn-delete-delivery:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+
 
 
 

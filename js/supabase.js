@@ -161,6 +161,29 @@
                 console.error('Error updating delivery date:', error);
                 throw error;
             }
+        },
+
+        deletePedido: async function(pedido) {
+            try {
+                await this.checkAdminSession();
+                const session = this.getSession();
+
+                const response = await fetch(`/api/pedidos?pedido=${encodeURIComponent(pedido)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Erro ao remover pedido.');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error deleting pedido:', error);
+                throw error;
+            }
         }
     };
 })();

@@ -158,11 +158,25 @@ module.exports = async (req, res) => {
         }
     }
 
-    // 3. DELETE - Delete All Pedidos (except delivered/faturados ones of the current planning week)
+    // 3. DELETE - Delete Pedidos
     if (req.method === 'DELETE') {
         try {
             await verifyAdmin();
 
+            const { pedido } = req.query;
+            if (pedido) {
+                // Deleta apenas o pedido específico do banco de dados
+                const { error } = await supabase
+                    .from('pedidos')
+                    .delete()
+                    .eq('pedido', pedido);
+
+                if (error) throw error;
+
+                return res.status(200).json({ success: true, message: `Pedido ${pedido} removido com sucesso.` });
+            }
+
+            // Se não houver parâmetro "pedido", executa a limpeza padrão da importação:
             // Calculate current planning week range (using the exact same logic as WeeklyPlanService)
             const today = new Date();
             const dayOfWeek = today.getDay();
