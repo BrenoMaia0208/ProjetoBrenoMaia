@@ -163,23 +163,24 @@ module.exports = async (req, res) => {
         try {
             await verifyAdmin();
 
-            const { pedido } = req.query;
-            if (pedido) {
+            const { id, pedido } = req.query;
+            if (id || pedido) {
                 // Em vez de deletar o registro do banco de dados (que removeria do dashboard),
                 // nós apenas definimos a data_entrega como null, retirando do planejamento semanal
                 let query = supabase.from('pedidos').update({ data_entrega: null });
                 
-                // Se for numérico, tenta dar o match como número, caso contrário como string
-                if (!isNaN(pedido) && pedido.trim() !== '') {
+                if (id) {
+                    query = query.eq('id', id);
+                } else if (pedido && !isNaN(pedido) && pedido.trim() !== '') {
                     query = query.eq('pedido', Number(pedido));
-                } else {
+                } else if (pedido) {
                     query = query.eq('pedido', pedido);
                 }
 
                 const { error } = await query;
                 if (error) throw error;
 
-                return res.status(200).json({ success: true, message: `Pedido ${pedido} desmarcado do planejamento semanal.` });
+                return res.status(200).json({ success: true, message: `Pedido desmarcado do planejamento semanal.` });
             }
 
             // Se não houver parâmetro "pedido", executa a limpeza padrão da importação:
@@ -268,16 +269,18 @@ module.exports = async (req, res) => {
         try {
             await verifyAdmin();
 
-            const { pedido, data_entrega } = req.body;
-            if (!pedido) {
-                return res.status(400).json({ error: 'Número do pedido é obrigatório para atualização.' });
+            const { id, pedido, data_entrega } = req.body;
+            if (!id && !pedido) {
+                return res.status(400).json({ error: 'ID ou Número do pedido é obrigatório para atualização.' });
             }
 
             let query = supabase.from('pedidos').update({ data_entrega: data_entrega || null });
             
-            if (!isNaN(pedido) && String(pedido).trim() !== '') {
+            if (id) {
+                query = query.eq('id', id);
+            } else if (pedido && !isNaN(pedido) && String(pedido).trim() !== '') {
                 query = query.eq('pedido', Number(pedido));
-            } else {
+            } else if (pedido) {
                 query = query.eq('pedido', pedido);
             }
 

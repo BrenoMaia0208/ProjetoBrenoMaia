@@ -186,18 +186,18 @@
                         const isChecked = !!this.checkedState[p.pedido];
                         const actionBtnHtml = isAdmin ? `
                             <div class="weekly-action-wrapper" style="position: relative; display: inline-block;">
-                                <button class="btn-action-delivery" data-pedido="${p.pedido}" title="Gerenciar Entrega" style="background: transparent; color: #64748b; border: none; cursor: pointer; padding: 4px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                                <div class="weekly-action-dropdown hidden" data-pedido="${p.pedido}" style="position: absolute; right: 0; top: 100%; background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.1); border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); z-index: 100; min-width: 190px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+                                <button class="btn-action-delivery" data-id="${p.id}" data-pedido="${p.pedido}" title="Gerenciar Entrega" style="background: transparent; color: #64748b; border: none; cursor: pointer; padding: 4px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                <div class="weekly-action-dropdown hidden" data-id="${p.id}" data-pedido="${p.pedido}" style="position: absolute; right: 0; top: 100%; background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.1); border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); z-index: 100; min-width: 190px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
                                     <div class="dropdown-main-menu" style="display: flex; flex-direction: column; gap: 4px;">
                                         <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; padding: 4px 8px; border-bottom: 1px solid rgba(15, 23, 42, 0.05); margin-bottom: 4px; text-align: left;">Gerenciar Entrega</div>
-                                        <button class="dropdown-item btn-postpone" data-pedido="${p.pedido}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #0f172a; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-primary);"></i> Reagendar</button>
-                                        <button class="dropdown-item btn-remove" data-pedido="${p.pedido}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #ef4444; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-minus"></i> Remover da Semana</button>
+                                        <button class="dropdown-item btn-postpone" data-id="${p.id}" data-pedido="${p.pedido}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #0f172a; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-primary);"></i> Reagendar</button>
+                                        <button class="dropdown-item btn-remove" data-id="${p.id}" data-pedido="${p.pedido}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #ef4444; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-minus"></i> Remover da Semana</button>
                                     </div>
                                     <div class="dropdown-reschedule-section hidden" style="display: flex; flex-direction: column; gap: 6px; padding: 4px;">
                                         <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-align: left;">Nova Data:</div>
                                         <input type="date" class="reschedule-date-input" value="${p.data_entrega || ''}" style="width: 100%; font-size: 0.8rem; padding: 6px; border: 1px solid rgba(15, 23, 42, 0.15); border-radius: 4px; background: #ffffff; color: #0f172a;">
                                         <div style="display: flex; gap: 4px; width: 100%;">
-                                            <button class="btn-save-reschedule btn-primary" data-pedido="${p.pedido}" style="flex: 1; font-size: 0.75rem; padding: 6px; border-radius: 4px; cursor: pointer; border: none; background: var(--accent-primary); color: white; font-weight: 600;">Salvar</button>
+                                            <button class="btn-save-reschedule btn-primary" data-id="${p.id}" data-pedido="${p.pedido}" style="flex: 1; font-size: 0.75rem; padding: 6px; border-radius: 4px; cursor: pointer; border: none; background: var(--accent-primary); color: white; font-weight: 600;">Salvar</button>
                                             <button class="btn-cancel-reschedule" style="flex: 1; font-size: 0.75rem; background: #e2e8f0; color: #0f172a; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: 600;">Voltar</button>
                                         </div>
                                     </div>
@@ -333,6 +333,7 @@
                     card.querySelectorAll('.btn-save-reschedule').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
                             e.stopPropagation();
+                            const dbId = btn.getAttribute('data-id');
                             const pedidoId = btn.getAttribute('data-pedido');
                             const dropdown = btn.closest('.weekly-action-dropdown');
                             const dateInput = dropdown ? dropdown.querySelector('.reschedule-date-input') : null;
@@ -350,7 +351,7 @@
                                 btn.disabled = true;
                                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                                 
-                                await window.SupabaseService.updateDeliveryDate(pedidoId, newDate);
+                                await window.SupabaseService.updateDeliveryDate(dbId, newDate);
                                 
                                 if (window.app && window.app.showNotification) {
                                     window.app.showNotification(`Pedido ${pedidoId} reagendado com sucesso para ${newDate.split('-').reverse().join('/')}!`, 'success');
@@ -378,6 +379,7 @@
                     card.querySelectorAll('.btn-remove').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
                             e.stopPropagation();
+                            const dbId = btn.getAttribute('data-id');
                             const pedidoId = btn.getAttribute('data-pedido');
                             const dropdown = btn.closest('.weekly-action-dropdown');
                             
@@ -389,7 +391,7 @@
                                 btn.disabled = true;
                                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                                 
-                                await window.SupabaseService.deletePedido(pedidoId);
+                                await window.SupabaseService.deletePedido(dbId);
                                 
                                 if (window.app && window.app.showNotification) {
                                     window.app.showNotification(`Pedido ${pedidoId} removido do planejamento!`, 'success');
