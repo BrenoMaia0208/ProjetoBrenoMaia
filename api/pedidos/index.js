@@ -121,7 +121,7 @@ module.exports = async (req, res) => {
         }
     }
 
-    // 2. POST - Insert Pedidos (Bulk insert)
+    // 2. POST - Insert Pedidos (Bulk insert with deduplication against preserved delivered orders)
     if (req.method === 'POST') {
         try {
             await verifyAdmin();
@@ -131,34 +131,50 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ error: 'Corpo da requisição deve ser uma lista de pedidos.' });
             }
 
-            const { data, error } = await supabase
+            // Fetch existing preserved orders to avoid duplicates
+            const { data: existing, error: fetchError } = await supabase
                 .from('pedidos')
-                .insert(rows);
+                .select('pedido');
 
-            if (error) throw error;
+            if (fetchError) throw fetchError;
 
-            return res.status(200).json({ success: true, message: `${rows.length} pedidos inseridos.` });
+            const existingSet = new Set((existing || []).map(p => String(p.pedido)));
+
+            // Filter out rows that are already in the database
+            const rowsToInsert = rows.filter(row => row.pedido && !existingSet.has(String(row.pedido)));
+
+            if (rowsToInsert.length > 0) {
+                const { data, error } = await supabase
+                    .from('pedidos')
+                    .insert(rowsToInsert);
+
+                if (error) throw error;
+            }
+
+            return res.status(200).json({ success: true, message: `${rowsToInsert.length} novos pedidos inseridos.` });
         } catch (err) {
             console.error('Error inserting pedidos server-side:', err);
             return res.status(err.message.includes('Acesso negado') ? 403 : 500).json({ error: err.message });
         }
     }
 
-    // 3. DELETE - Delete All Pedidos
+    // 3. DELETE - Delete All Pedidos (except delivered/faturados ones)
     if (req.method === 'DELETE') {
         try {
             await verifyAdmin();
 
+            // Deleta apenas os pedidos que NÃO estão entregues/faturados
             const { data, error } = await supabase
                 .from('pedidos')
                 .delete()
-                .neq('id', 0); // deletes all rows
+                .or('status_venda.is.null,status_venda.not.in.("FATURADO TOTAL","FATURADO","ENTREGUE")')
+                .not('saldo_faturar', 'eq', 0);
 
             if (error) throw error;
 
-            return res.status(200).json({ success: true, message: 'Todos os pedidos foram removidos.' });
+            return res.status(200).json({ success: true, message: 'Pedidos ativos limpos. Pedidos entregues foram preservados.' });
         } catch (err) {
-            console.error('Error deleting all pedidos server-side:', err);
+            console.error('Error deleting active pedidos server-side:', err);
             return res.status(err.message.includes('Acesso negado') ? 403 : 500).json({ error: err.message });
         }
     }
