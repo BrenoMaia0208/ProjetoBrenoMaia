@@ -616,13 +616,41 @@
                 await window.SupabaseService.checkAdminSession();
                 
                 progressContainer.classList.remove('hidden');
+                progressText.textContent = 'Preservando alterações locais...';
+                progressFill.style.width = '5%';
+
+                // Buscar pedidos atuais para preservar alterações de data do dashboard
+                let existingPedidos = [];
+                try {
+                    existingPedidos = await window.SupabaseService.fetchPedidos();
+                } catch (err) {
+                    console.warn('Erro ao carregar pedidos para preservar datas:', err);
+                }
+
+                // Mapear datas de entrega atuais pelo código do pedido
+                const preservedDatesMap = {};
+                existingPedidos.forEach(p => {
+                    if (p.pedido) {
+                        // Salva o valor de data_entrega (pode ser data válida ou null/remover)
+                        preservedDatesMap[String(p.pedido).trim()] = p.data_entrega;
+                    }
+                });
+                
                 progressText.textContent = 'Limpando banco de dados...';
-                progressFill.style.width = '10%';
+                progressFill.style.width = '15%';
                 
                 await window.SupabaseService.deleteAllPedidos();
                 
                 progressText.textContent = 'Enviando novos registros...';
                 progressFill.style.width = '30%';
+
+                // Sobrescrever as datas da planilha com as que estavam salvas no painel
+                this.validatedRows.forEach(row => {
+                    const pedCode = String(row.pedido).trim();
+                    if (preservedDatesMap.hasOwnProperty(pedCode)) {
+                        row.data_entrega = preservedDatesMap[pedCode];
+                    }
+                });
 
                 const onProgress = (percent) => {
                     const mappedPercent = 30 + (percent * 0.7); // escala de 30% a 100%
