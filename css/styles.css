@@ -1791,3 +1791,51 @@ body.light-theme .drawer-body h4 {
 .weekly-action-dropdown .dropdown-item.btn-remove:hover {
     background-color: #fef2f2 !important;
 }
+
+/* Premium Weekly Sum Card */
+#weekly-plan-total-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.18) !important;
+    padding: 8px 18px !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    color: #059669 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 0.9rem !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.05) !important;
+    transition: all var(--transition-fast) !important;
+    letter-spacing: 0.3px !important;
+}
+
+#weekly-plan-total-card:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+#weekly-plan-total-card i {
+    font-size: 1.15rem !important;
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.2)) !important;
+}
+
+#weekly-plan-total-card span {
+    color: #374151 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+}
+
+#weekly-plan-total-card strong {
+    font-size: 1.1rem !important;
+    color: #059669 !important;
+    font-weight: 800 !important;
+    margin-left: 6px !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
