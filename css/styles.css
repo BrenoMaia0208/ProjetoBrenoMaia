@@ -897,6 +897,22 @@ button {
 
 .modal-body {
     padding: 24px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 4px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(108, 99, 255, 0.3);
+    border-radius: 4px;
+}
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(108, 99, 255, 0.5);
 }
 
 .modal-footer {
@@ -1150,7 +1166,6 @@ button {
 
 .modal-card {
     background: rgba(26, 26, 46, 0.8) !important;
-    backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -1636,19 +1651,25 @@ body.light-theme .drawer-body h4 {
     gap: 12px;
     overflow-y: auto;
     flex: 1;
-    padding-right: 4px;
+    padding-right: 8px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Scrollbar inside day lists */
 .weekly-deliveries-list::-webkit-scrollbar {
-    width: 4px;
+    width: 8px;
 }
 .weekly-deliveries-list::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 4px;
 }
 .weekly-deliveries-list::-webkit-scrollbar-thumb {
-    background: rgba(15, 23, 42, 0.15);
-    border-radius: 2px;
+    background: rgba(15, 23, 42, 0.2);
+    border-radius: 4px;
+}
+.weekly-deliveries-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 23, 42, 0.4);
 }
 
 .weekly-delivery-item {
