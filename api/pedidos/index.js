@@ -165,15 +165,16 @@ module.exports = async (req, res) => {
 
             const { pedido } = req.query;
             if (pedido) {
-                // Deleta apenas o pedido específico do banco de dados
+                // Em vez de deletar o registro do banco de dados (que removeria do dashboard),
+                // nós apenas definimos a data_entrega como null, retirando do planejamento semanal
                 const { error } = await supabase
                     .from('pedidos')
-                    .delete()
+                    .update({ data_entrega: null })
                     .eq('pedido', pedido);
 
                 if (error) throw error;
 
-                return res.status(200).json({ success: true, message: `Pedido ${pedido} removido com sucesso.` });
+                return res.status(200).json({ success: true, message: `Pedido ${pedido} desmarcado do planejamento semanal.` });
             }
 
             // Se não houver parâmetro "pedido", executa a limpeza padrão da importação:
