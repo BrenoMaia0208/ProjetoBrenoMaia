@@ -178,36 +178,65 @@
 
                 const isAdmin = window.SupabaseService && window.SupabaseService.isAdmin();
 
+                // Group dayPedidos by Cidade, Programa, Grupo
+                const subGrouped = {};
+                dayPedidos.forEach(p => {
+                    const cidade = (p.cidade || 'Não informada').trim();
+                    const programa = (p.programa || '-').trim();
+                    const grupo = (p.grupo || '-').trim();
+                    const groupKey = `${cidade}|${programa}|${grupo}`;
+
+                    if (!subGrouped[groupKey]) {
+                        subGrouped[groupKey] = {
+                            cidade: cidade,
+                            programa: programa,
+                            grupo: grupo,
+                            data_entrega: p.data_entrega,
+                            total_pedido: 0,
+                            ids: [],
+                            pedidos: []
+                        };
+                    }
+                    subGrouped[groupKey].total_pedido += (p.total_pedido || 0);
+                    subGrouped[groupKey].ids.push(p.id);
+                    subGrouped[groupKey].pedidos.push(p.pedido);
+                });
+
+                const uniqueGroups = Object.values(subGrouped);
+
                 let deliveriesHtml = '';
-                if (dayPedidos.length === 0) {
+                if (uniqueGroups.length === 0) {
                     deliveriesHtml = `<div style="text-align: center; padding: 2rem 0; color: #64748b; font-size: 0.85rem; font-style: italic;">Nenhuma entrega</div>`;
                 } else {
-                    dayPedidos.forEach(p => {
-                        const isChecked = !!this.checkedState[p.pedido];
+                    uniqueGroups.forEach(g => {
+                        const isChecked = g.pedidos.every(ped => !!this.checkedState[ped]);
+                        const idsString = g.ids.join(',');
+                        const pedidosString = g.pedidos.join(',');
+
                         const actionBtnHtml = isAdmin ? `
                             <div class="weekly-action-wrapper" style="position: relative; display: inline-block;">
-                                <button class="btn-action-delivery" data-id="${p.id}" data-pedido="${p.pedido}" title="Gerenciar Entrega" style="background: transparent; color: #64748b; border: none; cursor: pointer; padding: 4px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                                <div class="weekly-action-dropdown hidden" data-id="${p.id}" data-pedido="${p.pedido}" style="position: absolute; right: 0; top: 100%; background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.1); border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); z-index: 100; min-width: 190px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+                                <button class="btn-action-delivery" data-id="${idsString}" data-pedido="${pedidosString}" title="Gerenciar Entrega" style="background: transparent; color: #64748b; border: none; cursor: pointer; padding: 4px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                <div class="weekly-action-dropdown hidden" data-id="${idsString}" data-pedido="${pedidosString}" style="position: absolute; right: 0; top: 100%; background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.1); border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); z-index: 100; min-width: 190px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
                                     <div class="dropdown-main-menu" style="display: flex; flex-direction: column; gap: 4px;">
                                         <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; padding: 4px 8px; border-bottom: 1px solid rgba(15, 23, 42, 0.05); margin-bottom: 4px; text-align: left;">Gerenciar Entrega</div>
-                                        <button class="dropdown-item btn-postpone" data-id="${p.id}" data-pedido="${p.pedido}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #0f172a; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-primary);"></i> Reagendar</button>
-                                        <button class="dropdown-item btn-remove" data-id="${p.id}" data-pedido="${p.pedido}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #ef4444; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-minus"></i> Remover da Semana</button>
+                                        <button class="dropdown-item btn-postpone" data-id="${idsString}" data-pedido="${pedidosString}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #0f172a; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-primary);"></i> Reagendar</button>
+                                        <button class="dropdown-item btn-remove" data-id="${idsString}" data-pedido="${pedidosString}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #ef4444; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-minus"></i> Remover da Semana</button>
                                     </div>
                                     <div class="dropdown-reschedule-section hidden" style="display: flex; flex-direction: column; gap: 6px; padding: 4px;">
                                         <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-align: left;">Nova Data:</div>
-                                        <input type="date" class="reschedule-date-input" value="${p.data_entrega || ''}" style="width: 100%; font-size: 0.8rem; padding: 6px; border: 1px solid rgba(15, 23, 42, 0.15); border-radius: 4px; background: #ffffff; color: #0f172a;">
+                                        <input type="date" class="reschedule-date-input" value="${g.data_entrega || ''}" style="width: 100%; font-size: 0.8rem; padding: 6px; border: 1px solid rgba(15, 23, 42, 0.15); border-radius: 4px; background: #ffffff; color: #0f172a;">
                                         <div style="display: flex; gap: 4px; width: 100%;">
-                                            <button class="btn-save-reschedule btn-primary" data-id="${p.id}" data-pedido="${p.pedido}" style="flex: 1; font-size: 0.75rem; padding: 6px; border-radius: 4px; cursor: pointer; border: none; background: var(--accent-primary); color: white; font-weight: 600;">Salvar</button>
+                                            <button class="btn-save-reschedule btn-primary" data-id="${idsString}" data-pedido="${pedidosString}" style="flex: 1; font-size: 0.75rem; padding: 6px; border-radius: 4px; cursor: pointer; border: none; background: var(--accent-primary); color: white; font-weight: 600;">Salvar</button>
                                             <button class="btn-cancel-reschedule" style="flex: 1; font-size: 0.75rem; background: #e2e8f0; color: #0f172a; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: 600;">Voltar</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         ` : '';
-                        
+
                         const checkboxHtml = isAdmin ? `
                             <label class="weekly-delivery-checkbox-container">
-                                <input type="checkbox" class="weekly-delivery-checkbox" data-pedido="${p.pedido}" ${isChecked ? 'checked' : ''}>
+                                <input type="checkbox" class="weekly-delivery-checkbox" data-pedido="${pedidosString}" ${isChecked ? 'checked' : ''}>
                                 <span class="status-label ${isChecked ? 'status-ok' : ''}">
                                     ${isChecked ? 'Realizada' : 'Pendente'}
                                 </span>
@@ -221,19 +250,19 @@
                         `;
 
                         deliveriesHtml += `
-                            <div class="weekly-delivery-item" data-pedido="${p.pedido}">
+                            <div class="weekly-delivery-item" data-pedido="${pedidosString}">
                                 <div class="weekly-delivery-header-row">
-                                    <span class="delivery-cidade" title="${p.cidade || 'Não informada'}">
-                                        <i class="fa-solid fa-location-dot" style="color: var(--accent-primary); margin-right: 6px;"></i>${p.cidade || 'Não informada'}
+                                    <span class="delivery-cidade" title="${g.cidade}">
+                                        <i class="fa-solid fa-location-dot" style="color: var(--accent-primary); margin-right: 6px;"></i>${g.cidade}
                                     </span>
                                     ${actionBtnHtml}
                                 </div>
                                 <div class="weekly-delivery-details">
-                                    <div class="detail-line"><span>Programa:</span> <strong>${p.programa || '-'}</strong></div>
-                                    <div class="detail-line"><span>Grupo:</span> <strong>${p.grupo || '-'}</strong></div>
+                                    <div class="detail-line"><span>Programa:</span> <strong>${g.programa}</strong></div>
+                                    <div class="detail-line"><span>Grupo:</span> <strong>${g.grupo}</strong></div>
                                 </div>
                                 <div class="weekly-delivery-footer">
-                                    <span class="delivery-value">${formatCurrency(p.total_pedido)}</span>
+                                    <span class="delivery-value">${formatCurrency(g.total_pedido)}</span>
                                     ${checkboxHtml}
                                 </div>
                             </div>
@@ -255,10 +284,15 @@
                 if (isAdmin) {
                     card.querySelectorAll('.weekly-delivery-checkbox').forEach(checkbox => {
                         checkbox.addEventListener('change', (e) => {
-                            const pedidoId = e.target.getAttribute('data-pedido');
+                            const pedidosString = e.target.getAttribute('data-pedido');
                             const checked = e.target.checked;
-                            this.checkedState[pedidoId] = checked;
-                            this.saveCheckedState();
+                            
+                            if (pedidosString) {
+                                pedidosString.split(',').forEach(pedidoId => {
+                                    this.checkedState[pedidoId.trim()] = checked;
+                                });
+                                this.saveCheckedState();
+                            }
 
                             const label = e.target.nextElementSibling;
                             if (checked) {
