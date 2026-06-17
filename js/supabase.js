@@ -48,6 +48,19 @@
             return true;
         },
 
+        isAdmin: function() {
+            try {
+                const session = this.getSession();
+                if (!session || !session.user) return false;
+                
+                const userEmail = (session.user.email || '').toLowerCase().trim();
+                const allowedAdmins = ['contato.brenomaia@hotmail.com', 'brenomaia0208@gmail.com', 'carlos.lucena@distribuidoraprovix.com'];
+                return allowedAdmins.includes(userEmail);
+            } catch (e) {
+                return false;
+            }
+        },
+
         insertPedidos: async function(rows, onProgress) {
             try {
                 await this.checkAdminSession();

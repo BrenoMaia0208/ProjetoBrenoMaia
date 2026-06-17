@@ -197,6 +197,16 @@
                         return val;
                     };
                     
+                    const isAdmin = window.SupabaseService.isAdmin();
+                    const deliveryDateHtml = isAdmin 
+                        ? `<div class="delivery-date-edit-container">
+                               <input type="date" class="edit-delivery-date" value="${row.data_entrega || ''}" data-pedido="${row.pedido}">
+                               <button class="btn-save-date btn-icon" data-pedido="${row.pedido}" style="display: none;" title="Salvar Previsão">
+                                   <i class="fa-solid fa-floppy-disk"></i>
+                               </button>
+                           </div>`
+                        : `<span>${formatDate(row.data_entrega)}</span>`;
+                    
                     const getStatusClass = (status) => {
                         if (!status) return '';
                         const s = status.toUpperCase();
