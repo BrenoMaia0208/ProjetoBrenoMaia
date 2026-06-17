@@ -1583,30 +1583,163 @@ body.light-theme .drawer-body h4 {
     color: #000000 !important;
 }
 
-#weekly-plan-modal .data-table th {
-    background: #f1f5f9 !important;
-    color: #000000 !important;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
-    font-weight: 700 !important;
+/* Weekly Plan Grid Layout */
+.weekly-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    width: 100%;
 }
 
-#weekly-plan-modal .data-table td {
-    color: #000000 !important;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.05) !important;
+@media (max-width: 1200px) {
+    .weekly-plan-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
 }
 
-#weekly-plan-modal .data-table tr:hover {
+.weekly-day-card {
     background: #f8fafc !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 16px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 350px;
+    max-height: 65vh;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
 }
 
-#weekly-plan-modal .status-label {
+.weekly-day-header {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent-primary) !important;
+    border-bottom: 2px solid var(--accent-primary);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.weekly-day-header .day-total {
+    font-size: 0.8rem;
     color: #000000 !important;
+    font-weight: 700;
+    background: rgba(15, 23, 42, 0.05);
+    padding: 2px 8px;
+    border-radius: 12px;
 }
 
-#weekly-plan-modal .weekly-delivery-checkbox:checked + .status-label,
-#weekly-plan-modal .status-label[style*="var(--accent-success)"] {
-    color: var(--accent-success) !important;
+.weekly-deliveries-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 4px;
 }
+
+/* Scrollbar inside day lists */
+.weekly-deliveries-list::-webkit-scrollbar {
+    width: 4px;
+}
+.weekly-deliveries-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+.weekly-deliveries-list::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.15);
+    border-radius: 2px;
+}
+
+.weekly-delivery-item {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 12px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast) !important;
+}
+
+.weekly-delivery-item:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06) !important;
+    border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+.weekly-delivery-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.delivery-cidade {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #000000 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
+}
+
+.delivery-pedido-num {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b !important;
+}
+
+.weekly-delivery-info {
+    font-size: 0.75rem;
+    color: #334155 !important;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.weekly-delivery-info strong {
+    color: #475569 !important;
+}
+
+.weekly-delivery-value {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #000000 !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px dashed rgba(15, 23, 42, 0.1);
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.weekly-delivery-checkbox-container {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 6px;
+    user-select: none;
+}
+
+.weekly-delivery-checkbox {
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent-success);
+    margin: 0;
+}
+
+.weekly-delivery-checkbox-container .status-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b !important;
+}
+
 
 
 

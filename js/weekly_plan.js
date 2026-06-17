@@ -111,76 +111,113 @@
         },
 
         renderPlan: function() {
-            const tbody = document.getElementById('weekly-plan-tbody');
-            if (!tbody) return;
+            const grid = document.getElementById('weekly-plan-grid');
+            if (!grid) return;
 
-            tbody.innerHTML = '';
-
-            if (this.weeklyPedidos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Nenhuma entrega prevista para a semana atual.</td></tr>';
-                return;
-            }
+            grid.innerHTML = '';
 
             const formatCurrency = (val) => {
                 return (val === null || val === undefined) ? '-' : (val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             };
 
-            const formatDate = (val) => {
-                if (!val) return '-';
-                const parts = val.split('-');
-                if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-                return val;
+            // Days setup (Monday to Friday)
+            const weekdays = [
+                { key: 'Segunda', name: 'Segunda-feira' },
+                { key: 'Terça', name: 'Terça-feira' },
+                { key: 'Quarta', name: 'Quarta-feira' },
+                { key: 'Quinta', name: 'Quinta-feira' },
+                { key: 'Sexta', name: 'Sexta-feira' }
+            ];
+
+            // Group weeklyPedidos by day name key
+            const grouped = {
+                'Segunda': [],
+                'Terça': [],
+                'Quarta': [],
+                'Quinta': [],
+                'Sexta': []
             };
 
             this.weeklyPedidos.forEach(p => {
-                const tr = document.createElement('tr');
-                const isChecked = !!this.checkedState[p.pedido];
+                const dayName = this.getDayName(p.data_entrega); // e.g., 'Segunda', 'Terça', etc.
+                if (grouped[dayName]) {
+                    grouped[dayName].push(p);
+                }
+            });
 
-                const dayName = this.getDayName(p.data_entrega);
+            weekdays.forEach(day => {
+                const dayPedidos = grouped[day.key] || [];
+                const dayTotal = dayPedidos.reduce((sum, p) => sum + (p.total_pedido || 0), 0);
 
-                tr.innerHTML = `
-                    <td style="font-weight: 600; color: var(--accent-secondary);">${dayName}</td>
-                    <td>${formatDate(p.data_entrega)}</td>
-                    <td>${p.cidade || '-'}</td>
-                    <td>${p.pedido || '-'}</td>
-                    <td>${p.programa || '-'}</td>
-                    <td>${p.grupo || '-'}</td>
-                    <td>${formatCurrency(p.total_pedido)}</td>
-                    <td style="text-align: center;">
-                        <label class="switch-container" style="display: inline-flex; align-items: center; cursor: pointer; gap: 8px;">
-                            <input type="checkbox" class="weekly-delivery-checkbox" data-pedido="${p.pedido}" ${isChecked ? 'checked' : ''} style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--accent-success);">
-                            <span class="status-label" style="font-size: 0.85rem; font-weight: 500; color: ${isChecked ? 'var(--accent-success)' : 'var(--text-secondary)'};">
-                                ${isChecked ? 'Realizada' : 'Pendente'}
-                            </span>
-                        </label>
-                    </td>
+                const card = document.createElement('div');
+                card.className = 'weekly-day-card';
+
+                let deliveriesHtml = '';
+                if (dayPedidos.length === 0) {
+                    deliveriesHtml = `<div style="text-align: center; padding: 2rem 0; color: #64748b; font-size: 0.85rem; font-style: italic;">Nenhuma entrega</div>`;
+                } else {
+                    dayPedidos.forEach(p => {
+                        const isChecked = !!this.checkedState[p.pedido];
+                        deliveriesHtml += `
+                            <div class="weekly-delivery-item" data-pedido="${p.pedido}">
+                                <div class="weekly-delivery-title">
+                                    <span class="delivery-cidade" title="${p.cidade || 'Não informada'}">${p.cidade || 'Não informada'}</span>
+                                    <span class="delivery-pedido-num">Ped: ${p.pedido || '-'}</span>
+                                </div>
+                                <div class="weekly-delivery-info">
+                                    <div><strong>Prog:</strong> ${p.programa || '-'}</div>
+                                    <div><strong>Grupo:</strong> ${p.grupo || '-'}</div>
+                                </div>
+                                <div class="weekly-delivery-value">
+                                    <span>${formatCurrency(p.total_pedido)}</span>
+                                    <label class="weekly-delivery-checkbox-container">
+                                        <input type="checkbox" class="weekly-delivery-checkbox" data-pedido="${p.pedido}" ${isChecked ? 'checked' : ''}>
+                                        <span class="status-label" style="color: ${isChecked ? 'var(--accent-success)' : '#64748b'};">
+                                            ${isChecked ? 'Ok' : 'Pend.'}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                card.innerHTML = `
+                    <div class="weekly-day-header">
+                        <span>${day.name}</span>
+                        <span class="day-total" title="Total das entregas do dia">${formatCurrency(dayTotal)}</span>
+                    </div>
+                    <div class="weekly-deliveries-list">
+                        ${deliveriesHtml}
+                    </div>
                 `;
 
-                // Event listener for checkbox status changes
-                const checkbox = tr.querySelector('.weekly-delivery-checkbox');
-                const label = tr.querySelector('.status-label');
-                checkbox.addEventListener('change', async (e) => {
-                    const checked = e.target.checked;
-                    this.checkedState[p.pedido] = checked;
-                    this.saveCheckedState();
+                // Add event listeners for checkboxes in this card
+                card.querySelectorAll('.weekly-delivery-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const pedidoId = e.target.getAttribute('data-pedido');
+                        const checked = e.target.checked;
+                        this.checkedState[pedidoId] = checked;
+                        this.saveCheckedState();
 
-                    // Update UI text and color
-                    if (checked) {
-                        label.textContent = 'Realizada';
-                        label.style.color = 'var(--accent-success)';
-                        if (window.app && window.app.showNotification) {
-                            window.app.showNotification(`Entrega do pedido ${p.pedido} marcada como Realizada!`, 'success');
+                        const label = e.target.nextElementSibling;
+                        if (checked) {
+                            label.textContent = 'Ok';
+                            label.style.color = 'var(--accent-success)';
+                            if (window.app && window.app.showNotification) {
+                                window.app.showNotification(`Pedido ${pedidoId} marcado como entregue!`, 'success');
+                            }
+                        } else {
+                            label.textContent = 'Pend.';
+                            label.style.color = '#64748b';
+                            if (window.app && window.app.showNotification) {
+                                window.app.showNotification(`Pedido ${pedidoId} marcado como pendente.`, 'info');
+                            }
                         }
-                    } else {
-                        label.textContent = 'Pendente';
-                        label.style.color = 'var(--text-secondary)';
-                        if (window.app && window.app.showNotification) {
-                            window.app.showNotification(`Entrega do pedido ${p.pedido} marcada como Pendente.`, 'info');
-                        }
-                    }
+                    });
                 });
 
-                tbody.appendChild(tr);
+                grid.appendChild(card);
             });
         }
     };
