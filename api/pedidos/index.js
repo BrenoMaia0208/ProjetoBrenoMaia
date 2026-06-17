@@ -163,5 +163,29 @@ module.exports = async (req, res) => {
         }
     }
 
+    // 4. PUT - Update Delivery Date of a Pedido
+    if (req.method === 'PUT') {
+        try {
+            await verifyAdmin();
+
+            const { pedido, data_entrega } = req.body;
+            if (!pedido) {
+                return res.status(400).json({ error: 'Número do pedido é obrigatório para atualização.' });
+            }
+
+            const { data, error } = await supabase
+                .from('pedidos')
+                .update({ data_entrega: data_entrega || null })
+                .eq('pedido', pedido);
+
+            if (error) throw error;
+
+            return res.status(200).json({ success: true, message: 'Previsão de entrega atualizada com sucesso.' });
+        } catch (err) {
+            console.error('Error updating delivery date server-side:', err);
+            return res.status(err.message.includes('Acesso negado') ? 403 : 500).json({ error: err.message });
+        }
+    }
+
     return res.status(405).json({ error: 'Method not allowed' });
 };

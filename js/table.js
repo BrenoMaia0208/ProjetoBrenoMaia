@@ -267,22 +267,25 @@
                                         <strong>Valor em Falteiro:</strong>
                                         <span>${formatCurrency(row.saldo_pedido)}</span>
                                     </div>
-                                    <div class="detail-item">
-                                        <strong>Previsão de Entrega:</strong>
-                                        <span>${formatDate(row.data_entrega)}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <strong>Nº Empenho:</strong>
-                                        <span>${row.num_empenho || '-'}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <strong>% Despachado:</strong>
-                                        <span>${formatPercent(row.perc_despacho)}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <strong>Vendedor:</strong>
-                                        <span>${row.vendedor || '-'}</span>
-                                    </div>
+                                    <div class="detail-item" style="min-width: 170px;">
+                                         <strong>Previsão de Entrega:</strong>
+                                         <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                                             <input type="date" class="edit-delivery-date" data-pedido="${row.pedido}" value="${row.data_entrega || ''}" style="padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-size: 0.85rem; outline: none; width: 140px;">
+                                             <button class="btn-save-date" data-pedido="${row.pedido}" style="display: none; padding: 6px 10px; font-size: 0.8rem; background: var(--accent-gradient); color: white; border-radius: var(--radius-sm); border: none; cursor: pointer; align-items: center; justify-content: center; height: 32px;"><i class="fa-solid fa-floppy-disk"></i></button>
+                                         </div>
+                                     </div>
+                                     <div class="detail-item">
+                                         <strong>Nº Empenho:</strong>
+                                         <span>${row.num_empenho || '-'}</span>
+                                     </div>
+                                     <div class="detail-item">
+                                         <strong>% Despachado:</strong>
+                                         <span>${formatPercent(row.perc_despacho)}</span>
+                                     </div>
+                                     <div class="detail-item">
+                                         <strong>Vendedor:</strong>
+                                         <span>${row.vendedor || '-'}</span>
+                                     </div>
                                 </div>
                             </div>
                         </td>
@@ -305,6 +308,57 @@
                     
                     tbody.appendChild(tr);
                     tbody.appendChild(detailsTr);
+
+                    // Configurar o editor de data de entrega
+                    const dateInput = detailsTr.querySelector('.edit-delivery-date');
+                    const saveBtn = detailsTr.querySelector('.btn-save-date');
+                    if (dateInput && saveBtn) {
+                        const originalValue = dateInput.value;
+                        dateInput.addEventListener('change', () => {
+                            if (dateInput.value !== originalValue) {
+                                saveBtn.style.display = 'inline-flex';
+                            } else {
+                                saveBtn.style.display = 'none';
+                            }
+                        });
+
+                        // Evitar cliques e fechar a linha
+                        dateInput.addEventListener('click', (e) => e.stopPropagation());
+                        saveBtn.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            const newDate = dateInput.value;
+                            const pedidoId = saveBtn.getAttribute('data-pedido');
+                            try {
+                                saveBtn.disabled = true;
+                                saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                                
+                                await window.SupabaseService.updateDeliveryDate(pedidoId, newDate);
+                                
+                                // Atualiza localmente
+                                row.data_entrega = newDate;
+                                
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification('Previsão de entrega atualizada com sucesso!', 'success');
+                                }
+                                
+                                saveBtn.style.display = 'none';
+                                saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
+                                saveBtn.disabled = false;
+                                
+                                // Recarrega os dados para atualizar os outros elementos do painel
+                                if (window.app && window.app.loadData) {
+                                    await window.app.loadData();
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification(err.message || 'Erro ao atualizar data de entrega.', 'error');
+                                }
+                                saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
+                                saveBtn.disabled = false;
+                            }
+                        });
+                    }
                 });
             }
 

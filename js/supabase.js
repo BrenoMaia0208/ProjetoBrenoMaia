@@ -136,6 +136,31 @@
                 console.error(`Error fetching distinct values for ${column}:`, error);
                 return [];
             }
+        },
+
+        updateDeliveryDate: async function(pedido, date) {
+            try {
+                await this.checkAdminSession();
+                const session = this.getSession();
+
+                const response = await fetch('/api/pedidos', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({ pedido: String(pedido), data_entrega: date || null })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Erro ao atualizar data de entrega.');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error updating delivery date:', error);
+                throw error;
+            }
         }
     };
 })();
