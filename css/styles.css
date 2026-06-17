@@ -1776,8 +1776,18 @@ body.light-theme .drawer-body h4 {
     background: rgba(239, 68, 68, 0.1) !important;
 }
 
+.weekly-action-dropdown {
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
 
+.weekly-action-dropdown .dropdown-item {
+    transition: background-color var(--transition-fast) !important;
+}
 
+.weekly-action-dropdown .dropdown-item:hover {
+    background-color: #f1f5f9 !important;
+}
 
-
-
+.weekly-action-dropdown .dropdown-item.btn-remove:hover {
+    background-color: #fef2f2 !important;
+}

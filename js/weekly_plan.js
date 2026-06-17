@@ -9,6 +9,13 @@
         init: function() {
             this.setupModal();
             this.loadCheckedState();
+            
+            // Global click handler to close dropdowns when clicking outside
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.weekly-action-dropdown').forEach(d => {
+                    d.classList.add('hidden');
+                });
+            });
         },
 
         setupModal: function() {
@@ -177,8 +184,25 @@
                 } else {
                     dayPedidos.forEach(p => {
                         const isChecked = !!this.checkedState[p.pedido];
-                        const deleteBtnHtml = isAdmin ? `
-                            <button class="btn-delete-delivery" data-pedido="${p.pedido}" title="Remover do Planejamento" style="background: transparent; color: #ef4444; border: none; cursor: pointer; padding: 4px; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-trash-can"></i></button>
+                        const actionBtnHtml = isAdmin ? `
+                            <div class="weekly-action-wrapper" style="position: relative; display: inline-block;">
+                                <button class="btn-action-delivery" data-pedido="${p.pedido}" title="Gerenciar Entrega" style="background: transparent; color: #64748b; border: none; cursor: pointer; padding: 4px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                <div class="weekly-action-dropdown hidden" data-pedido="${p.pedido}" style="position: absolute; right: 0; top: 100%; background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.1); border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); z-index: 100; min-width: 190px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+                                    <div class="dropdown-main-menu" style="display: flex; flex-direction: column; gap: 4px;">
+                                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; padding: 4px 8px; border-bottom: 1px solid rgba(15, 23, 42, 0.05); margin-bottom: 4px; text-align: left;">Gerenciar Entrega</div>
+                                        <button class="dropdown-item btn-postpone" data-pedido="${p.pedido}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #0f172a; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-primary);"></i> Reagendar</button>
+                                        <button class="dropdown-item btn-remove" data-pedido="${p.pedido}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #ef4444; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-minus"></i> Remover da Semana</button>
+                                    </div>
+                                    <div class="dropdown-reschedule-section hidden" style="display: flex; flex-direction: column; gap: 6px; padding: 4px;">
+                                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-align: left;">Nova Data:</div>
+                                        <input type="date" class="reschedule-date-input" value="${p.data_entrega || ''}" style="width: 100%; font-size: 0.8rem; padding: 6px; border: 1px solid rgba(15, 23, 42, 0.15); border-radius: 4px; background: #ffffff; color: #0f172a;">
+                                        <div style="display: flex; gap: 4px; width: 100%;">
+                                            <button class="btn-save-reschedule btn-primary" data-pedido="${p.pedido}" style="flex: 1; font-size: 0.75rem; padding: 6px; border-radius: 4px; cursor: pointer; border: none; background: var(--accent-primary); color: white; font-weight: 600;">Salvar</button>
+                                            <button class="btn-cancel-reschedule" style="flex: 1; font-size: 0.75rem; background: #e2e8f0; color: #0f172a; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: 600;">Voltar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         ` : '';
                         
                         const checkboxHtml = isAdmin ? `
@@ -202,7 +226,7 @@
                                     <span class="delivery-cidade" title="${p.cidade || 'Não informada'}">
                                         <i class="fa-solid fa-location-dot" style="color: var(--accent-primary); margin-right: 6px;"></i>${p.cidade || 'Não informada'}
                                     </span>
-                                    ${deleteBtnHtml}
+                                    ${actionBtnHtml}
                                 </div>
                                 <div class="weekly-delivery-details">
                                     <div class="detail-line"><span>Programa:</span> <strong>${p.programa || '-'}</strong></div>
@@ -253,12 +277,111 @@
                         });
                     });
 
-                    card.querySelectorAll('.btn-delete-delivery').forEach(btn => {
+                    // Ellipsis Menu Toggle
+                    card.querySelectorAll('.btn-action-delivery').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            document.querySelectorAll('.weekly-action-dropdown').forEach(d => {
+                                if (d !== btn.nextElementSibling) d.classList.add('hidden');
+                            });
+                            const dropdown = btn.nextElementSibling;
+                            if (dropdown) {
+                                dropdown.classList.toggle('hidden');
+                                const mainMenu = dropdown.querySelector('.dropdown-main-menu');
+                                const rescheduleSec = dropdown.querySelector('.dropdown-reschedule-section');
+                                if (mainMenu && rescheduleSec) {
+                                    mainMenu.classList.remove('hidden');
+                                    rescheduleSec.classList.add('hidden');
+                                }
+                            }
+                        });
+                    });
+
+                    // Postpone button click (switch to date picker view)
+                    card.querySelectorAll('.btn-postpone').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const dropdown = btn.closest('.weekly-action-dropdown');
+                            if (dropdown) {
+                                const mainMenu = dropdown.querySelector('.dropdown-main-menu');
+                                const rescheduleSec = dropdown.querySelector('.dropdown-reschedule-section');
+                                if (mainMenu && rescheduleSec) {
+                                    mainMenu.classList.add('hidden');
+                                    rescheduleSec.classList.remove('hidden');
+                                }
+                            }
+                        });
+                    });
+
+                    // Cancel Reschedule button click
+                    card.querySelectorAll('.btn-cancel-reschedule').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const dropdown = btn.closest('.weekly-action-dropdown');
+                            if (dropdown) {
+                                const mainMenu = dropdown.querySelector('.dropdown-main-menu');
+                                const rescheduleSec = dropdown.querySelector('.dropdown-reschedule-section');
+                                if (mainMenu && rescheduleSec) {
+                                    mainMenu.classList.remove('hidden');
+                                    rescheduleSec.classList.add('hidden');
+                                }
+                            }
+                        });
+                    });
+
+                    // Save Reschedule Click handler
+                    card.querySelectorAll('.btn-save-reschedule').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
                             e.stopPropagation();
                             const pedidoId = btn.getAttribute('data-pedido');
+                            const dropdown = btn.closest('.weekly-action-dropdown');
+                            const dateInput = dropdown ? dropdown.querySelector('.reschedule-date-input') : null;
+                            if (!dateInput) return;
+
+                            const newDate = dateInput.value;
+                            if (!newDate) {
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification('Selecione uma data válida.', 'error');
+                                }
+                                return;
+                            }
+
+                            try {
+                                btn.disabled = true;
+                                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                                
+                                await window.SupabaseService.updateDeliveryDate(pedidoId, newDate);
+                                
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification(`Pedido ${pedidoId} reagendado com sucesso para ${newDate.split('-').reverse().join('/')}!`, 'success');
+                                }
+                                
+                                if (dropdown) dropdown.classList.add('hidden');
+
+                                // Reload and update UI
+                                if (window.app && window.app.loadData) {
+                                    await window.app.loadData();
+                                    this.renderPlan();
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification(err.message || 'Erro ao reagendar pedido.', 'error');
+                                }
+                                btn.innerHTML = 'Salvar';
+                                btn.disabled = false;
+                            }
+                        });
+                    });
+
+                    // Remove from Planning (Delete) handler
+                    card.querySelectorAll('.btn-remove').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            const pedidoId = btn.getAttribute('data-pedido');
+                            const dropdown = btn.closest('.weekly-action-dropdown');
                             
-                            if (!confirm(`Deseja realmente remover o pedido ${pedidoId} do planejamento?`)) {
+                            if (!confirm(`Deseja realmente remover o pedido ${pedidoId} do cronograma desta semana?`)) {
                                 return;
                             }
                             
@@ -271,18 +394,53 @@
                                 if (window.app && window.app.showNotification) {
                                     window.app.showNotification(`Pedido ${pedidoId} removido do planejamento!`, 'success');
                                 }
+
+                                if (dropdown) dropdown.classList.add('hidden');
+
+                                // HIDE THE ITEM IMMEDIATELY IN THE DOM (OPTIMISTIC UI UPDATE)
+                                const deliveryItem = btn.closest('.weekly-delivery-item');
+                                if (deliveryItem) {
+                                    deliveryItem.style.transition = 'all 0.3s ease';
+                                    deliveryItem.style.opacity = '0';
+                                    deliveryItem.style.transform = 'scale(0.8)';
+                                    setTimeout(() => {
+                                        deliveryItem.remove();
+                                        // Recalculate day total
+                                        const cardBody = btn.closest('.weekly-day-card');
+                                        if (cardBody) {
+                                            const remainingItems = cardBody.querySelectorAll('.weekly-delivery-item');
+                                            let dayTotal = 0;
+                                            remainingItems.forEach(item => {
+                                                const valueSpan = item.querySelector('.delivery-value');
+                                                if (valueSpan) {
+                                                    const valueText = valueSpan.textContent.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+                                                    dayTotal += parseFloat(valueText) || 0;
+                                                }
+                                            });
+                                            const totalEl = cardBody.querySelector('.day-total');
+                                            if (totalEl) {
+                                                totalEl.textContent = dayTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                                            }
+                                            
+                                            if (remainingItems.length === 0) {
+                                                const listContainer = cardBody.querySelector('.weekly-deliveries-list');
+                                                if (listContainer) {
+                                                    listContainer.innerHTML = `<div style="text-align: center; padding: 2rem 0; color: #64748b; font-size: 0.85rem; font-style: italic;">Nenhuma entrega</div>`;
+                                                }
+                                            }
+                                        }
+                                    }, 300);
+                                }
                                 
-                                // Reload data and update UI
                                 if (window.app && window.app.loadData) {
                                     await window.app.loadData();
-                                    this.renderPlan();
                                 }
                             } catch (err) {
                                 console.error(err);
                                 if (window.app && window.app.showNotification) {
                                     window.app.showNotification(err.message || 'Erro ao remover pedido.', 'error');
                                 }
-                                btn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                                btn.innerHTML = 'Remover da Semana';
                                 btn.disabled = false;
                             }
                         });
