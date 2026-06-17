@@ -200,8 +200,8 @@
                     const isAdmin = window.SupabaseService.isAdmin();
                     const deliveryDateHtml = isAdmin 
                         ? `<div class="delivery-date-edit-container">
-                               <input type="date" class="edit-delivery-date" value="${row.data_entrega || ''}" data-pedido="${row.pedido}">
-                               <button class="btn-save-date btn-icon" data-pedido="${row.pedido}" style="display: none;" title="Salvar Previsão">
+                               <input type="date" class="edit-delivery-date" value="${row.data_entrega || ''}" data-id="${row.id}">
+                               <button class="btn-save-date btn-icon" data-id="${row.id}" style="display: none;" title="Salvar Previsão">
                                    <i class="fa-solid fa-floppy-disk"></i>
                                </button>
                            </div>`
@@ -335,7 +335,7 @@
                             saveBtn.addEventListener('click', async (e) => {
                                 e.stopPropagation();
                                 const newDate = dateInput.value;
-                                const pedidoId = saveBtn.getAttribute('data-pedido');
+                                const pedidoId = saveBtn.getAttribute('data-id');
                                 try {
                                     saveBtn.disabled = true;
                                     saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';

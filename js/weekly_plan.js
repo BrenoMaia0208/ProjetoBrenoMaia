@@ -140,6 +140,13 @@
 
             grid.innerHTML = '';
 
+            // Calculate total for the entire week
+            const weekTotal = this.weeklyPedidos.reduce((sum, p) => sum + (p.total_pedido || 0), 0);
+            const weekTotalEl = document.getElementById('weekly-plan-total-value');
+            if (weekTotalEl) {
+                weekTotalEl.textContent = weekTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }
+
             const formatCurrency = (val) => {
                 return (val === null || val === undefined) ? '-' : (val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             };
@@ -456,6 +463,19 @@
                                             const totalEl = cardBody.querySelector('.day-total');
                                             if (totalEl) {
                                                 totalEl.textContent = dayTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                                            }
+                                            
+                                            // Recalculate all day totals to update the week's total
+                                            let newWeekTotal = 0;
+                                            document.querySelectorAll('.weekly-day-card').forEach(dayCard => {
+                                                dayCard.querySelectorAll('.delivery-value').forEach(valSpan => {
+                                                    const valueText = valSpan.textContent.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+                                                    newWeekTotal += parseFloat(valueText) || 0;
+                                                });
+                                            });
+                                            const weekTotalEl = document.getElementById('weekly-plan-total-value');
+                                            if (weekTotalEl) {
+                                                weekTotalEl.textContent = newWeekTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                                             }
                                             
                                             if (remainingItems.length === 0) {

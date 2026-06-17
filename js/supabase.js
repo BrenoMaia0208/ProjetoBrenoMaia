@@ -151,7 +151,7 @@
             }
         },
 
-        updateDeliveryDate: async function(pedido, date) {
+        updateDeliveryDate: async function(id, date) {
             try {
                 await this.checkAdminSession();
                 const session = this.getSession();
@@ -162,7 +162,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${session.access_token}`
                     },
-                    body: JSON.stringify({ pedido: String(pedido), data_entrega: date || null })
+                    body: JSON.stringify({ id: id, data_entrega: date || null })
                 });
 
                 if (!response.ok) {
@@ -176,12 +176,12 @@
             }
         },
 
-        deletePedido: async function(pedido) {
+        deletePedido: async function(id) {
             try {
                 await this.checkAdminSession();
                 const session = this.getSession();
 
-                const response = await fetch(`/api/pedidos?pedido=${encodeURIComponent(pedido)}`, {
+                const response = await fetch(`/api/pedidos?id=${encodeURIComponent(id)}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${session.access_token}`

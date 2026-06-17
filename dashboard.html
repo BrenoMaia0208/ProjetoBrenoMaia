@@ -278,10 +278,14 @@
 
     <!-- Weekly Plan Modal -->
     <div id="weekly-plan-modal" class="modal-overlay hidden">
-        <div class="modal-card" style="max-width: 95%; width: 1400px;">
-            <div class="modal-header">
+        <div class="modal-card" style="max-width: 98%; width: 1650px;">
+            <div class="modal-header" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
                 <h3><i class="fa-solid fa-calendar-week" style="color: var(--accent-primary); margin-right: 8px;"></i>PLANEJAMENTO DE ENTREGA SEMANAL</h3>
-                <span id="weekly-plan-dates" class="badge" style="margin-left: 12px; background: rgba(108, 99, 255, 0.15); color: var(--accent-primary);">15/06 a 19/06</span>
+                <span id="weekly-plan-dates" class="badge" style="background: rgba(108, 99, 255, 0.15); color: var(--accent-primary); font-size: 0.9rem; padding: 6px 12px; border-radius: 8px;">15/06 a 19/06</span>
+                <div id="weekly-plan-total-card" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 6px 16px; border-radius: 8px; font-weight: 700; color: #10b981; display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                    <span>Soma das Entregas na Semana: <strong id="weekly-plan-total-value">R$ 0,00</strong></span>
+                </div>
                 <button id="weekly-plan-close-btn" class="btn-icon" style="margin-left: auto;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body" style="max-height: 75vh; overflow-y: auto; padding: 20px;">

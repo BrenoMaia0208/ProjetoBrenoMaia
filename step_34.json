@@ -1,0 +1,44 @@
+﻿
+C:\Users\Brenno\.gemini\antigravity\brain\cad9f0fe-155d-47d6-97d2-d3d68844318a\.system_generated\logs\transcript.jsonl:
+34:{"step_index":34,"source":"MODEL","type":"VIEW_FILE","status":"DONE","created_at":"2026-06-06T16:38:24Z","content":"
+Created At: 2026-06-06T16:38:24Z\nCompleted At: 2026-06-06T16:38:24Z\nFile Path: 
+`file:///C:/Users/Brenno/.gemini/antigravity/scratch/ProjetoBrenoMaia-main/js/table.js`\nTotal Lines: 195\nTotal 
+Bytes: 7939\nShowing lines 1 to 195\nThe following code has been modified to include a line number before every line, 
+in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove 
+the line number, colon, and leading space.\n1: (function() {\n2:     'use strict';\n3: \n4:     window.TableService = 
+{\n5:         allData: [],\n6:         filteredData: [],\n7:         currentPage: 1,\n8:         itemsPerPage: 20,\n9: 
+        currentSort: { column: null, asc: true },\n10: \n11:         init: function() {\n12:             
+this.setupSearch();\n13:             this.setupSorting();\n14:             this.setupPagination();\n15:         
+},\n16: \n17:         render: function(data) {\n18:             this.allData = (data || []).map(row => {\n19:          
+       const totalRomaneio = row.total_romaneio || 0;\n20:                 const saldoDespacho = row.saldo_despacho || 
+0;\n21:                 const totalPedido = row.total_pedido || 0;\n22:                 \n23:                 
+row.total_disponivel = totalRomaneio + saldoDespacho;\n24:                 row.perc_disponivel = totalPedido > 0 ? 
+parseFloat(((row.total_disponivel / totalPedido) * 100).toFixed(2)) : 0;\n25:                 return row;\n26:         
+    });\n27:             this.applyLocalFilters();\n28:         },\n29: \n30:         getCurrentData: function() 
+{\n31:             return this.filteredData;\n32:         },\n33: \n34:         setupSearch: function() {\n35:         
+    // Removido, a busca agora é global pelo backend via SupabaseService\n36:         },\n37: \n38:         
+setupSorting: function() {\n39:             const headers = document.querySelectorAll('#table-head 
+th[data-sort]');\n40:             headers.forEach(th => {\n41:                 th.addEventListener('click', () => 
+{\n42:                     const column = th.dataset.sort;\n43:              \n<truncated 5260 
+bytes>\normatCurrency(row.total_pedido)}</td>\n158:                         
+<td>${formatPercent(row.perc_disponivel)}</td>\n159:                         
+<td>${formatCurrency(row.total_disponivel)}</td>\n160:                         <td><span class=\"status-badge 
+${getStatusClass(row.status_venda)}\">${row.status_venda || '-'}</span></td>\n161:                         <td><span 
+class=\"status-badge ${getStatusClass(row.status_compra)}\">${row.status_compra || '-'}</span></td>\n162:              
+           <td>${formatDate(row.data_entrega)}</td>\n163:                     `;\n164:                     
+tbody.appendChild(tr);\n165:                 });\n166:             }\n167: \n168:             
+this.updatePaginationUI();\n169:         },\n170: \n171:         updatePaginationUI: function() {\n172:             
+const total = this.filteredData.length;\n173:             const maxPage = Math.ceil(total / this.itemsPerPage) || 
+1;\n174:             \n175:             const tableInfo = document.getElementById('table-info');\n176:             if 
+(tableInfo) {\n177:                 const start = total === 0 ? 0 : ((this.currentPage - 1) * this.itemsPerPage) + 
+1;\n178:                 const end = Math.min(this.currentPage * this.itemsPerPage, total);\n179:                 
+tableInfo.textContent = `Mostrando ${start}-${end} de ${total} resultados`;\n180:             }\n181:             
+\n182:             const pageInfo = document.getElementById('page-info');\n183:             if (pageInfo) {\n184:      
+           pageInfo.textContent = `Página ${this.currentPage} de ${maxPage}`;\n185:             }\n186:             
+\n187:             const prevBtn = document.getElementById('prev-page-btn');\n188:             if (prevBtn) 
+prevBtn.disabled = this.currentPage <= 1;\n189:             \n190:             const nextBtn = 
+document.getElementById('next-page-btn');\n191:             if (nextBtn) nextBtn.disabled = this.currentPage >= 
+maxPage || maxPage === 0;\n192:         }\n193:     };\n194: })();\n195: \nThe above content shows the entire, 
+complete file contents of the requested file.\n"}
+
+

@@ -1,0 +1,39 @@
+﻿
+C:\Users\Brenno\.gemini\antigravity\brain\cad9f0fe-155d-47d6-97d2-d3d68844318a\.system_generated\logs\transcript.jsonl:
+1089:{"step_index":1103,"source":"MODEL","type":"CODE_ACTION","status":"DONE","created_at":"2026-06-10T12:13:16Z","cont
+ent":"Created At: 2026-06-10T12:13:16Z\nCompleted At: 2026-06-10T12:13:16Z\nThe following changes were made by the 
+replace_file_content tool to: C:\\Users\\Brenno\\.gemini\\antigravity\\scratch\\ProjetoBrenoMaia-main\\dashboard.html. 
+If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for 
+permission.\n[diff_block_start]\n@@ -263,6 +263,43 @@\n                     <button type=\"submit\" 
+id=\"new-user-submit-btn\" class=\"btn-primary w-100\">Criar Conta</button>\r\n                 </div>\r\n             
+</form>\r\n+    </div>\r\n+\r\n+    <!-- Help Drawer -->\r\n+    <div id=\"help-drawer\" class=\"drawer-overlay 
+hidden\">\r\n+        <div class=\"drawer-card\">\r\n+            <div class=\"drawer-header\">\r\n+                
+<h3><i class=\"fa-solid fa-circle-question\" style=\"color: var(--accent-primary); margin-right: 8px;\"></i>Guia do 
+Painel</h3>\r\n+                <button id=\"help-close-btn\" class=\"btn-icon\"><i class=\"fa-solid 
+fa-xmark\"></i></button>\r\n+            </div>\r\n+            <div class=\"drawer-body\">\r\n+                
+<h4>Indicadores (KPIs)</h4>\r\n+                <ul>\r\n+                    <li><strong>Total Pedidos:</strong> 
+Quantidade total de pedidos de venda cadastrados sob os filtros ativos.</li>\r\n+                    <li><strong>Valor 
+Total:</strong> Faturamento total bruto acumulado nos pedidos filtrados.</li>\r\n+                    
+<li><strong>Total Faturado:</strong> Valor total dos pedidos que já emitiram nota fiscal.</li>\r\n+                    
+<li><strong>Total Despachado:</strong> Valor total dos pedidos que já foram enviados física ou digitalmente.</li>\r\n+ 
+                   <li><strong>Saldo a Faturar:</strong> Montante restante que ainda aguarda emissão de 
+nota.</li>\r\n+                    <li><strong>Saldo Despacho:</strong> Saldo de pedidos faturados que ainda precisam 
+ser expedidos.</li>\r\n+                    <li><strong>Total Solicitado:</strong> Quantidade consolidada de insumos 
+comprados/solicitados no ERP.</li>\r\n+                </ul>\r\n+                \r\n+                <h4 
+class=\"mt-4\">Termos da Tabela</h4>\r\n+                <ul>\r\n+                    <li><strong>% Disp. (Percentual 
+Disponível):</strong> Proporção de mercadorias já em posse e prontas para entrega.</li>\r\n+                    
+<li><strong>Total Disponível:</strong> Soma do que está em romaneio físico e o saldo final de despacho.</li>\r\n+      
+              <li><strong>Status Venda:</strong> Fase comercial do pedido (ex: *Em aberto, Em Estoque, Parcial, Em 
+Andamento*).</li>\r\n+                    <li><strong>Status Compra:</strong> Estágio de abastecimento no ERP (ex: 
+*Sem solicitação de compra, Comprado*).</li>\r\n+                    <li><strong>Entrega:</strong> Data de compromisso 
+final com o cliente.</li>\r\n+                </ul>\r\n+                \r\n+                <h4 
+class=\"mt-4\">Filtros Rápidos</h4>\r\n+                <ul>\r\n+                    <li><strong>Atrasados:</strong> 
+Pedidos com prazo expirado que continuam com status comercial pendente.</li>\r\n+                    
+<li><strong>Aguardando Compra:</strong> Pedidos que necessitam que o setor de compras faça a aquisição dos 
+produtos.</li>\r\n+                    <li><strong>Em Estoque:</strong> Pedidos cujas mercadorias já estão no galpão, 
+prontas para faturamento/entrega.</li>\r\n+                </ul>\r\n+            </div>\r\n         </div>\r\n     
+</div>\r\n \r\n[diff_block_end]\n\nPlease note that the above snippet only shows the MODIFIED lines from the last 
+change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may 
+have many more lines not shown."}
+
+
