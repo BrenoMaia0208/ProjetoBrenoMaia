@@ -206,28 +206,52 @@ module.exports = async (req, res) => {
             friday.setDate(monday.getDate() + 4);
             friday.setHours(23, 59, 59, 999);
 
-            const mondayStr = monday.toISOString().split('T')[0];
-            const fridayStr = friday.toISOString().split('T')[0];
-
-            // Passo 1: Deleta pedidos ATIVOS (não faturados/entregues totalmente)
-            const { error: activeError } = await supabase
+            // Passo 1: Buscar todos os registros do banco de dados para filtrar em memória
+            const { data: allRows, error: fetchError } = await supabase
                 .from('pedidos')
-                .delete()
-                .or('status_venda.is.null,status_venda.not.in.("FATURADO TOTAL","FATURADO","ENTREGUE")')
-                .not('saldo_faturar', 'eq', 0);
+                .select('id, status_venda, saldo_faturar, data_entrega');
 
-            if (activeError) throw activeError;
+            if (fetchError) throw fetchError;
 
-            // Passo 2: Deleta pedidos ENTREGUES de outras semanas (anteriores ou posteriores à semana de planejamento)
-            const { error: pastError } = await supabase
-                .from('pedidos')
-                .delete()
-                .or(`data_entrega.lt.${mondayStr},data_entrega.gt.${fridayStr},data_entrega.is.null`)
-                .or('status_venda.in.("FATURADO TOTAL","FATURADO","ENTREGUE"),saldo_faturar.eq.0');
+            // Passo 2: Identificar quais registros devem ser deletados
+            const idsToDelete = [];
+            const mondayTime = monday.getTime();
+            const fridayTime = friday.getTime();
 
-            if (pastError) throw pastError;
+            (allRows || []).forEach(row => {
+                const statusUpper = String(row.status_venda || '').toUpperCase();
+                const isDelivered = 
+                    ['FATURADO TOTAL', 'FATURADO', 'ENTREGUE'].includes(statusUpper) || 
+                    row.saldo_faturar === 0;
 
-            return res.status(200).json({ success: true, message: 'Pedidos ativos limpos. Apenas entregas finalizadas da semana corrente foram mantidas.' });
+                if (!isDelivered) {
+                    // Pedidos ativos são sempre excluídos para dar lugar aos dados da nova planilha
+                    idsToDelete.push(row.id);
+                } else {
+                    // Pedidos entregues/faturados são deletados se estiverem fora da semana atual de planejamento
+                    if (!row.data_entrega) {
+                        idsToDelete.push(row.id);
+                    } else {
+                        const deliveryDate = new Date(row.data_entrega + 'T12:00:00');
+                        const deliveryTime = deliveryDate.getTime();
+                        if (deliveryTime < mondayTime || deliveryTime > fridayTime) {
+                            idsToDelete.push(row.id);
+                        }
+                    }
+                }
+            });
+
+            // Passo 3: Deletar em lote os registros identificados
+            if (idsToDelete.length > 0) {
+                const { error: deleteError } = await supabase
+                    .from('pedidos')
+                    .delete()
+                    .in('id', idsToDelete);
+
+                if (deleteError) throw deleteError;
+            }
+
+            return res.status(200).json({ success: true, message: `Pedidos ativos limpos (${idsToDelete.length} registros deletados). Apenas entregas finalizadas da semana corrente foram mantidas.` });
         } catch (err) {
             console.error('Error deleting active/out-of-week orders server-side:', err);
             return res.status(err.message.includes('Acesso negado') ? 403 : 500).json({ error: err.message });
