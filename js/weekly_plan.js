@@ -61,14 +61,31 @@
             // Get current date
             const today = new Date();
             const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
+            const hours = today.getHours();
             
-            // Calculate Monday of current week
-            const monday = new Date(today);
-            const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-            monday.setDate(today.getDate() + diffToMonday);
+            // Shift to next week if it's Friday after 17:00 or weekend (Saturday/Sunday)
+            let shiftToNextWeek = false;
+            if (dayOfWeek === 5 && hours >= 17) {
+                shiftToNextWeek = true;
+            } else if (dayOfWeek === 6 || dayOfWeek === 0) {
+                shiftToNextWeek = true;
+            }
+
+            const baseDate = new Date(today);
+            if (shiftToNextWeek) {
+                // Shift base date forward to next week's Monday
+                // Friday (5) -> add 3 days, Saturday (6) -> add 2 days, Sunday (0) -> add 1 day
+                const daysToAdd = dayOfWeek === 5 ? 3 : (dayOfWeek === 6 ? 2 : 1);
+                baseDate.setDate(today.getDate() + daysToAdd);
+            }
+
+            const baseDayOfWeek = baseDate.getDay();
+            const monday = new Date(baseDate);
+            const diffToMonday = baseDayOfWeek === 0 ? -6 : 1 - baseDayOfWeek;
+            monday.setDate(baseDate.getDate() + diffToMonday);
             monday.setHours(0, 0, 0, 0);
 
-            // Calculate Friday of current week
+            // Friday of that week
             const friday = new Date(monday);
             friday.setDate(monday.getDate() + 4);
             friday.setHours(23, 59, 59, 999);
