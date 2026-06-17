@@ -169,19 +169,40 @@
                 const card = document.createElement('div');
                 card.className = 'weekly-day-card';
 
+                const isAdmin = window.SupabaseService && window.SupabaseService.isAdmin();
+
                 let deliveriesHtml = '';
                 if (dayPedidos.length === 0) {
                     deliveriesHtml = `<div style="text-align: center; padding: 2rem 0; color: #64748b; font-size: 0.85rem; font-style: italic;">Nenhuma entrega</div>`;
                 } else {
                     dayPedidos.forEach(p => {
                         const isChecked = !!this.checkedState[p.pedido];
+                        const deleteBtnHtml = isAdmin ? `
+                            <button class="btn-delete-delivery" data-pedido="${p.pedido}" title="Remover do Planejamento" style="background: transparent; color: #ef4444; border: none; cursor: pointer; padding: 4px; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-trash-can"></i></button>
+                        ` : '';
+                        
+                        const checkboxHtml = isAdmin ? `
+                            <label class="weekly-delivery-checkbox-container">
+                                <input type="checkbox" class="weekly-delivery-checkbox" data-pedido="${p.pedido}" ${isChecked ? 'checked' : ''}>
+                                <span class="status-label ${isChecked ? 'status-ok' : ''}">
+                                    ${isChecked ? 'Realizada' : 'Pendente'}
+                                </span>
+                            </label>
+                        ` : `
+                            <div class="weekly-delivery-checkbox-container" style="cursor: default;">
+                                <span class="status-label ${isChecked ? 'status-ok' : ''}">
+                                    ${isChecked ? 'Realizada' : 'Pendente'}
+                                </span>
+                            </div>
+                        `;
+
                         deliveriesHtml += `
                             <div class="weekly-delivery-item" data-pedido="${p.pedido}">
                                 <div class="weekly-delivery-header-row">
                                     <span class="delivery-cidade" title="${p.cidade || 'Não informada'}">
                                         <i class="fa-solid fa-location-dot" style="color: var(--accent-primary); margin-right: 6px;"></i>${p.cidade || 'Não informada'}
                                     </span>
-                                    <button class="btn-delete-delivery" data-pedido="${p.pedido}" title="Remover do Planejamento" style="background: transparent; color: #ef4444; border: none; cursor: pointer; padding: 4px; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-trash-can"></i></button>
+                                    ${deleteBtnHtml}
                                 </div>
                                 <div class="weekly-delivery-details">
                                     <div class="detail-line"><span>Programa:</span> <strong>${p.programa || '-'}</strong></div>
@@ -189,12 +210,7 @@
                                 </div>
                                 <div class="weekly-delivery-footer">
                                     <span class="delivery-value">${formatCurrency(p.total_pedido)}</span>
-                                    <label class="weekly-delivery-checkbox-container">
-                                        <input type="checkbox" class="weekly-delivery-checkbox" data-pedido="${p.pedido}" ${isChecked ? 'checked' : ''}>
-                                        <span class="status-label ${isChecked ? 'status-ok' : ''}">
-                                            ${isChecked ? 'Realizada' : 'Pendente'}
-                                        </span>
-                                    </label>
+                                    ${checkboxHtml}
                                 </div>
                             </div>
                         `;
@@ -211,67 +227,67 @@
                     </div>
                 `;
 
-                // Add event listeners for checkboxes in this card
-                card.querySelectorAll('.weekly-delivery-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', (e) => {
-                        const pedidoId = e.target.getAttribute('data-pedido');
-                        const checked = e.target.checked;
-                        this.checkedState[pedidoId] = checked;
-                        this.saveCheckedState();
+                // Add event listeners only if admin
+                if (isAdmin) {
+                    card.querySelectorAll('.weekly-delivery-checkbox').forEach(checkbox => {
+                        checkbox.addEventListener('change', (e) => {
+                            const pedidoId = e.target.getAttribute('data-pedido');
+                            const checked = e.target.checked;
+                            this.checkedState[pedidoId] = checked;
+                            this.saveCheckedState();
 
-                        const label = e.target.nextElementSibling;
-                        if (checked) {
-                            label.textContent = 'Realizada';
-                            label.classList.add('status-ok');
-                            if (window.app && window.app.showNotification) {
-                                window.app.showNotification(`Entrega para ${day.name} marcada como Realizada!`, 'success');
+                            const label = e.target.nextElementSibling;
+                            if (checked) {
+                                label.textContent = 'Realizada';
+                                label.classList.add('status-ok');
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification(`Entrega para ${day.name} marcada como Realizada!`, 'success');
+                                }
+                            } else {
+                                label.textContent = 'Pendente';
+                                label.classList.remove('status-ok');
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification(`Entrega para ${day.name} marcada como Pendente.`, 'info');
+                                }
                             }
-                        } else {
-                            label.textContent = 'Pendente';
-                            label.classList.remove('status-ok');
-                            if (window.app && window.app.showNotification) {
-                                window.app.showNotification(`Entrega para ${day.name} marcada como Pendente.`, 'info');
-                            }
-                        }
+                        });
                     });
-                });
 
-                // Add event listeners for delete button
-                card.querySelectorAll('.btn-delete-delivery').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        e.stopPropagation();
-                        const pedidoId = btn.getAttribute('data-pedido');
-                        
-                        if (!confirm(`Deseja realmente remover o pedido ${pedidoId} do planejamento?`)) {
-                            return;
-                        }
-                        
-                        try {
-                            btn.disabled = true;
-                            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                    card.querySelectorAll('.btn-delete-delivery').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            const pedidoId = btn.getAttribute('data-pedido');
                             
-                            await window.SupabaseService.deletePedido(pedidoId);
-                            
-                            if (window.app && window.app.showNotification) {
-                                window.app.showNotification(`Pedido ${pedidoId} removido do planejamento!`, 'success');
+                            if (!confirm(`Deseja realmente remover o pedido ${pedidoId} do planejamento?`)) {
+                                return;
                             }
                             
-                            // Reload data and update UI
-                            if (window.app && window.app.loadData) {
-                                await window.app.loadData();
-                                // Re-render current plan since the service has updated weeklyPedidos
-                                this.renderPlan();
+                            try {
+                                btn.disabled = true;
+                                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                                
+                                await window.SupabaseService.deletePedido(pedidoId);
+                                
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification(`Pedido ${pedidoId} removido do planejamento!`, 'success');
+                                }
+                                
+                                // Reload data and update UI
+                                if (window.app && window.app.loadData) {
+                                    await window.app.loadData();
+                                    this.renderPlan();
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification(err.message || 'Erro ao remover pedido.', 'error');
+                                }
+                                btn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                                btn.disabled = false;
                             }
-                        } catch (err) {
-                            console.error(err);
-                            if (window.app && window.app.showNotification) {
-                                window.app.showNotification(err.message || 'Erro ao remover pedido.', 'error');
-                            }
-                            btn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-                            btn.disabled = false;
-                        }
+                        });
                     });
-                });
+                }
 
                 grid.appendChild(card);
             });
