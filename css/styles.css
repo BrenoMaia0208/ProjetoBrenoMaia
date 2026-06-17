@@ -1554,3 +1554,58 @@ body.light-theme .drawer-body h4 {
     border-bottom-color: rgba(15, 23, 42, 0.08) !important;
 }
 
+/* Light Theme Overrides for Weekly Plan Modal */
+body.light-theme #weekly-plan-modal .modal-card {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.light-theme #weekly-plan-modal .modal-header {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme #weekly-plan-modal .modal-header h3 {
+    color: #000000 !important;
+}
+
+body.light-theme #weekly-plan-modal .modal-header h3 i {
+    color: var(--accent-primary) !important;
+}
+
+body.light-theme #weekly-plan-modal #weekly-plan-close-btn {
+    color: #000000 !important;
+}
+
+body.light-theme #weekly-plan-modal #weekly-plan-dates {
+    background: rgba(15, 23, 42, 0.06) !important;
+    color: #000000 !important;
+}
+
+body.light-theme #weekly-plan-modal .data-table th {
+    background: #f1f5f9 !important;
+    color: #000000 !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+    font-weight: 700 !important;
+}
+
+body.light-theme #weekly-plan-modal .data-table td {
+    color: #000000 !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme #weekly-plan-modal .data-table tr:hover {
+    background: #f8fafc !important;
+}
+
+body.light-theme #weekly-plan-modal .status-label {
+    color: #000000 !important;
+}
+
+body.light-theme #weekly-plan-modal .weekly-delivery-checkbox:checked + .status-label,
+body.light-theme #weekly-plan-modal .status-label[style*="var(--accent-success)"] {
+    color: var(--accent-success) !important;
+}
+
+
