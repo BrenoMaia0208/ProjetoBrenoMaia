@@ -160,20 +160,21 @@
                         const isChecked = !!this.checkedState[p.pedido];
                         deliveriesHtml += `
                             <div class="weekly-delivery-item" data-pedido="${p.pedido}">
-                                <div class="weekly-delivery-title">
-                                    <span class="delivery-cidade" title="${p.cidade || 'Não informada'}">${p.cidade || 'Não informada'}</span>
-                                    <span class="delivery-pedido-num">Ped: ${p.pedido || '-'}</span>
+                                <div class="weekly-delivery-header-row">
+                                    <span class="delivery-cidade" title="${p.cidade || 'Não informada'}">
+                                        <i class="fa-solid fa-location-dot" style="color: var(--accent-primary); margin-right: 6px;"></i>${p.cidade || 'Não informada'}
+                                    </span>
                                 </div>
-                                <div class="weekly-delivery-info">
-                                    <div><strong>Prog:</strong> ${p.programa || '-'}</div>
-                                    <div><strong>Grupo:</strong> ${p.grupo || '-'}</div>
+                                <div class="weekly-delivery-details">
+                                    <div class="detail-line"><span>Programa:</span> <strong>${p.programa || '-'}</strong></div>
+                                    <div class="detail-line"><span>Grupo:</span> <strong>${p.grupo || '-'}</strong></div>
                                 </div>
-                                <div class="weekly-delivery-value">
-                                    <span>${formatCurrency(p.total_pedido)}</span>
+                                <div class="weekly-delivery-footer">
+                                    <span class="delivery-value">${formatCurrency(p.total_pedido)}</span>
                                     <label class="weekly-delivery-checkbox-container">
                                         <input type="checkbox" class="weekly-delivery-checkbox" data-pedido="${p.pedido}" ${isChecked ? 'checked' : ''}>
-                                        <span class="status-label" style="color: ${isChecked ? 'var(--accent-success)' : '#64748b'};">
-                                            ${isChecked ? 'Ok' : 'Pend.'}
+                                        <span class="status-label ${isChecked ? 'status-ok' : ''}">
+                                            ${isChecked ? 'Realizada' : 'Pendente'}
                                         </span>
                                     </label>
                                 </div>
@@ -202,16 +203,16 @@
 
                         const label = e.target.nextElementSibling;
                         if (checked) {
-                            label.textContent = 'Ok';
-                            label.style.color = 'var(--accent-success)';
+                            label.textContent = 'Realizada';
+                            label.classList.add('status-ok');
                             if (window.app && window.app.showNotification) {
-                                window.app.showNotification(`Pedido ${pedidoId} marcado como entregue!`, 'success');
+                                window.app.showNotification(`Entrega para ${day.name} marcada como Realizada!`, 'success');
                             }
                         } else {
-                            label.textContent = 'Pend.';
-                            label.style.color = '#64748b';
+                            label.textContent = 'Pendente';
+                            label.classList.remove('status-ok');
                             if (window.app && window.app.showNotification) {
-                                window.app.showNotification(`Pedido ${pedidoId} marcado como pendente.`, 'info');
+                                window.app.showNotification(`Entrega para ${day.name} marcada como Pendente.`, 'info');
                             }
                         }
                     });
