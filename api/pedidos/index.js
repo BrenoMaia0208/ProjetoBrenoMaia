@@ -158,23 +158,63 @@ module.exports = async (req, res) => {
         }
     }
 
-    // 3. DELETE - Delete All Pedidos (except delivered/faturados ones)
+    // 3. DELETE - Delete All Pedidos (except delivered/faturados ones of the current planning week)
     if (req.method === 'DELETE') {
         try {
             await verifyAdmin();
 
-            // Deleta apenas os pedidos que NÃO estão entregues/faturados
-            const { data, error } = await supabase
+            // Calculate current planning week range (using the exact same logic as WeeklyPlanService)
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const hours = today.getHours();
+            
+            let shiftToNextWeek = false;
+            if (dayOfWeek === 5 && hours >= 17) {
+                shiftToNextWeek = true;
+            } else if (dayOfWeek === 6 || dayOfWeek === 0) {
+                shiftToNextWeek = true;
+            }
+
+            const baseDate = new Date(today);
+            if (shiftToNextWeek) {
+                const daysToAdd = dayOfWeek === 5 ? 3 : (dayOfWeek === 6 ? 2 : 1);
+                baseDate.setDate(today.getDate() + daysToAdd);
+            }
+
+            const baseDayOfWeek = baseDate.getDay();
+            const monday = new Date(baseDate);
+            const diffToMonday = baseDayOfWeek === 0 ? -6 : 1 - baseDayOfWeek;
+            monday.setDate(baseDate.getDate() + diffToMonday);
+            monday.setHours(0, 0, 0, 0);
+
+            const friday = new Date(monday);
+            friday.setDate(monday.getDate() + 4);
+            friday.setHours(23, 59, 59, 999);
+
+            const mondayStr = monday.toISOString().split('T')[0];
+            const fridayStr = friday.toISOString().split('T')[0];
+
+            // Passo 1: Deleta pedidos ATIVOS (não faturados/entregues totalmente)
+            const { error: activeError } = await supabase
                 .from('pedidos')
                 .delete()
                 .or('status_venda.is.null,status_venda.not.in.("FATURADO TOTAL","FATURADO","ENTREGUE")')
                 .not('saldo_faturar', 'eq', 0);
 
-            if (error) throw error;
+            if (activeError) throw activeError;
 
-            return res.status(200).json({ success: true, message: 'Pedidos ativos limpos. Pedidos entregues foram preservados.' });
+            // Passo 2: Deleta pedidos ENTREGUES de outras semanas (anteriores ou posteriores à semana de planejamento)
+            const { error: pastError } = await supabase
+                .from('pedidos')
+                .delete()
+                .or(`data_entrega.lt.${mondayStr},data_entrega.gt.${fridayStr},data_entrega.is.null`)
+                .or('status_venda.in.("FATURADO TOTAL","FATURADO","ENTREGUE"),saldo_faturar.eq.0');
+
+            if (pastError) throw pastError;
+
+            return res.status(200).json({ success: true, message: 'Pedidos ativos limpos. Apenas entregas finalizadas da semana corrente foram mantidas.' });
         } catch (err) {
-            console.error('Error deleting active pedidos server-side:', err);
+            console.error('Error deleting active/out-of-week orders server-side:', err);
             return res.status(err.message.includes('Acesso negado') ? 403 : 500).json({ error: err.message });
         }
     }
