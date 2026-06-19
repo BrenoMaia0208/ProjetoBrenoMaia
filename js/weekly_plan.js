@@ -139,9 +139,14 @@
                                             box-sizing: border-box !important;
                                             white-space: nowrap !important;
                                         }
-                                        /* Force dark text color on all elements to support dark mode screenshot contrast */
-                                        #weekly-plan-grid, 
-                                        #weekly-plan-grid * {
+                                        /* Force dark text color on specific text nodes to support dark mode screenshot contrast without breaking total badge white text */
+                                        #weekly-plan-grid,
+                                        .weekly-day-header span,
+                                        .delivery-cidade,
+                                        .detail-line,
+                                        .detail-line span,
+                                        .detail-line strong,
+                                        .delivery-value {
                                             color: #0f172a !important;
                                         }
                                         .weekly-day-card {
