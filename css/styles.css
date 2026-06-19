@@ -1569,20 +1569,38 @@ body.light-theme .drawer-body h4 {
     border-bottom-color: rgba(15, 23, 42, 0.08) !important;
 }
 
-/* Overrides for Weekly Plan Modal (Always white background and black text) */
+/* Overrides for Weekly Plan Modal (Always clean white/premium backdrop) */
 #weekly-plan-modal .modal-card {
     background: #ffffff !important;
-    color: #000000 !important;
-    border: 1px solid rgba(15, 23, 42, 0.1) !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important;
+    border-radius: var(--radius-lg) !important;
+    backdrop-filter: blur(10px);
+    animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.97) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 #weekly-plan-modal .modal-header {
-    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+    padding: 20px 24px !important;
 }
 
 #weekly-plan-modal .modal-header h3 {
-    color: #000000 !important;
+    color: #0f172a !important;
+    font-size: 1.25rem !important;
+    letter-spacing: -0.5px !important;
+    font-weight: 800 !important;
 }
 
 #weekly-plan-modal .modal-header h3 i {
@@ -1590,59 +1608,113 @@ body.light-theme .drawer-body h4 {
 }
 
 #weekly-plan-modal #weekly-plan-close-btn {
-    color: #000000 !important;
+    color: #475569 !important;
+    transition: all 0.2s;
+}
+
+#weekly-plan-modal #weekly-plan-close-btn:hover {
+    color: #0f172a !important;
+    transform: rotate(90deg);
 }
 
 #weekly-plan-modal #weekly-plan-dates {
-    background: rgba(15, 23, 42, 0.06) !important;
-    color: #000000 !important;
+    background: rgba(108, 99, 255, 0.1) !important;
+    color: var(--accent-primary) !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(108, 99, 255, 0.15);
 }
 
 /* Weekly Plan Grid Layout */
 .weekly-plan-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
+    gap: 18px;
     width: 100%;
 }
 
 @media (max-width: 1200px) {
     .weekly-plan-grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
 }
 
 .weekly-day-card {
     background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.08) !important;
-    border-radius: var(--radius-lg) !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    border-radius: 16px !important;
     padding: 16px !important;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    min-height: 380px;
-    max-height: 65vh;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    min-height: 420px;
+    max-height: 68vh;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.02) !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    position: relative;
+    overflow: hidden;
+    animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Staggered entry animation for day cards */
+.weekly-day-card:nth-child(1) { animation-delay: 0.05s; }
+.weekly-day-card:nth-child(2) { animation-delay: 0.1s; }
+.weekly-day-card:nth-child(3) { animation-delay: 0.15s; }
+.weekly-day-card:nth-child(4) { animation-delay: 0.2s; }
+.weekly-day-card:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes cardSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Theme variations for each day card */
+.weekly-day-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--day-theme-color);
+}
+
+.weekly-day-card:nth-child(1) { --day-theme-color: linear-gradient(90deg, #3b82f6, #60a5fa); } /* Seg */
+.weekly-day-card:nth-child(2) { --day-theme-color: linear-gradient(90deg, #6366f1, #818cf8); } /* Ter */
+.weekly-day-card:nth-child(3) { --day-theme-color: linear-gradient(90deg, #ec4899, #f472b6); } /* Qua */
+.weekly-day-card:nth-child(4) { --day-theme-color: linear-gradient(90deg, #f59e0b, #fbbf24); } /* Qui */
+.weekly-day-card:nth-child(5) { --day-theme-color: linear-gradient(90deg, #10b981, #34d399); } /* Sex */
+
+.weekly-day-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06) !important;
+    border-color: rgba(15, 23, 42, 0.1) !important;
 }
 
 .weekly-day-header {
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 800;
     color: #0f172a !important;
-    border-bottom: 2px solid var(--accent-primary);
-    padding-bottom: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(15, 23, 42, 0.08);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .weekly-day-header .day-total {
-    font-size: 0.85rem;
-    color: var(--accent-primary) !important;
+    font-size: 0.8rem;
+    color: #0f172a !important;
     font-weight: 700;
-    background: rgba(108, 99, 255, 0.08);
+    background: #f1f5f9;
     padding: 4px 10px;
-    border-radius: 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(15, 23, 42, 0.04);
 }
 
 .weekly-deliveries-list {
@@ -1651,93 +1723,96 @@ body.light-theme .drawer-body h4 {
     gap: 12px;
     overflow-y: auto;
     flex: 1;
-    padding-right: 8px;
+    padding-right: 4px;
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
 }
 
-/* Scrollbar inside day lists */
+/* Custom modern scrollbar */
 .weekly-deliveries-list::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 .weekly-deliveries-list::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: 4px;
+    background: transparent;
 }
 .weekly-deliveries-list::-webkit-scrollbar-thumb {
-    background: rgba(15, 23, 42, 0.2);
-    border-radius: 4px;
+    background: #cbd5e1;
+    border-radius: 10px;
 }
 .weekly-deliveries-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(15, 23, 42, 0.4);
+    background: #94a3b8;
 }
 
 .weekly-delivery-item {
-    background: #f8fafc !important;
+    background: #ffffff !important;
     border: 1px solid rgba(15, 23, 42, 0.06) !important;
-    border-radius: var(--radius-md) !important;
-    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    padding: 14px !important;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01) !important;
-    transition: all var(--transition-fast) !important;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.01) !important;
+    transition: all 0.25s ease !important;
 }
 
 .weekly-delivery-item:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05) !important;
-    border-color: rgba(108, 99, 255, 0.2) !important;
-    background: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06) !important;
+    border-color: rgba(108, 99, 255, 0.25) !important;
 }
 
 .weekly-delivery-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
 .delivery-cidade {
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 0.85rem;
+    font-weight: 800;
     color: #0f172a !important;
     display: flex;
     align-items: center;
+    letter-spacing: -0.2px;
 }
 
 .weekly-delivery-details {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    background: rgba(15, 23, 42, 0.02);
-    padding: 8px 10px;
-    border-radius: var(--radius-sm);
+    gap: 5px;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(15, 23, 42, 0.02);
 }
 
 .detail-line {
     font-size: 0.75rem;
-    color: #475569 !important;
+    color: #64748b !important;
     display: flex;
     justify-content: space-between;
 }
 
+.detail-line span {
+    color: #64748b !important;
+}
+
 .detail-line strong {
-    color: #0f172a !important;
-    font-weight: 600;
+    color: #1e293b !important;
+    font-weight: 700;
 }
 
 .weekly-delivery-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid rgba(15, 23, 42, 0.06);
-    padding-top: 8px;
-    margin-top: 2px;
+    border-top: 1px dashed rgba(15, 23, 42, 0.06);
+    padding-top: 10px;
 }
 
 .delivery-value {
     font-size: 0.85rem;
-    font-weight: 700;
+    font-weight: 800;
     color: #0f172a !important;
 }
 
@@ -1751,45 +1826,41 @@ body.light-theme .drawer-body h4 {
 
 .weekly-delivery-checkbox {
     cursor: pointer;
-    width: 16px;
-    height: 16px;
-    accent-color: var(--accent-success);
+    width: 15px;
+    height: 15px;
+    accent-color: #10b981;
     margin: 0;
 }
 
 .weekly-delivery-checkbox-container .status-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    color: #64748b !important;
-    background: rgba(100, 116, 139, 0.08);
-    padding: 2px 8px;
-    border-radius: 10px;
-    transition: all var(--transition-fast);
+    color: #f59e0b !important;
+    background: rgba(245, 158, 11, 0.08) !important;
+    padding: 3px 8px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+    border: 1px solid rgba(245, 158, 11, 0.1);
 }
 
 .weekly-delivery-checkbox-container .status-label.status-ok {
-    color: var(--accent-success) !important;
+    color: #10b981 !important;
     background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.1) !important;
 }
 
-.btn-delete-delivery:hover {
-    background: rgba(239, 68, 68, 0.1) !important;
+/* Premium Reschedule Actions styling */
+.weekly-reschedule-actions button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.weekly-action-dropdown {
-    transition: opacity var(--transition-fast), transform var(--transition-fast);
+.weekly-reschedule-actions button:hover {
+    transform: scale(1.05);
 }
 
-.weekly-action-dropdown .dropdown-item {
-    transition: background-color var(--transition-fast) !important;
-}
-
-.weekly-action-dropdown .dropdown-item:hover {
-    background-color: #f1f5f9 !important;
-}
-
-.weekly-action-dropdown .dropdown-item.btn-remove:hover {
-    background-color: #fef2f2 !important;
+.weekly-reschedule-actions button:active {
+    transform: scale(0.95);
 }
 
 /* Premium Weekly Sum Card */
@@ -1804,14 +1875,14 @@ body.light-theme .drawer-body h4 {
     align-items: center !important;
     gap: 10px !important;
     font-size: 0.9rem !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.05) !important;
-    transition: all var(--transition-fast) !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.03) !important;
+    transition: all 0.2s !important;
     letter-spacing: 0.3px !important;
 }
 
 #weekly-plan-total-card:hover {
     transform: translateY(-1px) !important;
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.1) !important;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.08) !important;
     border-color: rgba(16, 185, 129, 0.3) !important;
 }
 
@@ -1820,19 +1891,19 @@ body.light-theme .drawer-body h4 {
     background: linear-gradient(135deg, #10b981, #059669) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
-    filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.2)) !important;
+    filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.15)) !important;
 }
 
 #weekly-plan-total-card span {
-    color: #374151 !important;
+    color: #475569 !important;
     font-size: 0.75rem !important;
     text-transform: uppercase !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     letter-spacing: 0.5px !important;
 }
 
 #weekly-plan-total-card strong {
-    font-size: 1.1rem !important;
+    font-size: 1.15rem !important;
     color: #059669 !important;
     font-weight: 800 !important;
     margin-left: 6px !important;
