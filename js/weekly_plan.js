@@ -139,6 +139,11 @@
                                             box-sizing: border-box !important;
                                             white-space: nowrap !important;
                                         }
+                                        /* Force dark text color on all elements to support dark mode screenshot contrast */
+                                        #weekly-plan-grid, 
+                                        #weekly-plan-grid * {
+                                            color: #0f172a !important;
+                                        }
                                         .weekly-day-card {
                                             display: inline-block !important;
                                             width: 325px !important;
@@ -175,7 +180,6 @@
                                             color: #ffffff !important;
                                             border-radius: 20px !important;
                                             font-weight: 800 !important;
-                                            display: inline-block !important;
                                         }
                                         .weekly-deliveries-list {
                                             max-height: none !important;
