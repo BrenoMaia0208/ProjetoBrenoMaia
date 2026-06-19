@@ -237,22 +237,15 @@
                         const pedidosString = g.pedidos.join(',');
 
                         const actionBtnHtml = isAdmin ? `
-                            <div class="weekly-action-wrapper" style="position: relative; display: inline-block;">
-                                <button class="btn-action-delivery" data-id="${idsString}" data-pedido="${pedidosString}" title="Gerenciar Entrega" style="background: transparent; color: #64748b; border: none; cursor: pointer; padding: 4px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                                <div class="weekly-action-dropdown hidden" data-id="${idsString}" data-pedido="${pedidosString}" style="position: absolute; right: 0; top: 100%; background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.1); border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); z-index: 100; min-width: 190px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
-                                    <div class="dropdown-main-menu" style="display: flex; flex-direction: column; gap: 4px;">
-                                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; padding: 4px 8px; border-bottom: 1px solid rgba(15, 23, 42, 0.05); margin-bottom: 4px; text-align: left;">Gerenciar Entrega</div>
-                                        <button class="dropdown-item btn-postpone" data-id="${idsString}" data-pedido="${pedidosString}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #0f172a; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-primary);"></i> Reagendar</button>
-                                    </div>
-                                    <div class="dropdown-reschedule-section hidden" style="display: flex; flex-direction: column; gap: 6px; padding: 4px;">
-                                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-align: left;">Nova Data:</div>
-                                        <input type="date" class="reschedule-date-input" value="${g.data_entrega || ''}" style="width: 100%; font-size: 0.8rem; padding: 6px; border: 1px solid rgba(15, 23, 42, 0.15); border-radius: 4px; background: #ffffff; color: #0f172a;">
-                                        <div style="display: flex; gap: 4px; width: 100%;">
-                                            <button class="btn-save-reschedule btn-primary" data-id="${idsString}" data-pedido="${pedidosString}" style="flex: 1; font-size: 0.75rem; padding: 6px; border-radius: 4px; cursor: pointer; border: none; background: var(--accent-primary); color: white; font-weight: 600;">Salvar</button>
-                                            <button class="btn-cancel-reschedule" style="flex: 1; font-size: 0.75rem; background: #e2e8f0; color: #0f172a; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: 600;">Voltar</button>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="weekly-reschedule-actions" style="display: flex; align-items: center; gap: 6px; position: relative;">
+                                <button class="btn-reschedule-trigger" data-pedido="${pedidosString}" style="background: rgba(108, 99, 255, 0.08); color: var(--accent-primary); border: none; cursor: pointer; padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; transition: all 0.2s;" title="Alterar Data de Entrega">
+                                    <i class="fa-regular fa-calendar-days"></i> Reagendar
+                                </button>
+                                <input type="date" class="reschedule-date-input-hidden" data-pedido="${pedidosString}" value="${g.data_entrega || ''}" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; left: 0;">
+                                
+                                <button class="btn-remove-planning" data-pedido="${pedidosString}" style="background: rgba(239, 68, 68, 0.08); color: var(--accent-danger); border: none; cursor: pointer; padding: 4px 6px; font-size: 0.75rem; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Remover do Planejamento Semanal">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
                             </div>
                         ` : '';
 
@@ -334,88 +327,44 @@
                     });
 
                     // Ellipsis Menu Toggle
-                    card.querySelectorAll('.btn-action-delivery').forEach(btn => {
+                    // Reagendar Button Trigger
+                    card.querySelectorAll('.btn-reschedule-trigger').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            document.querySelectorAll('.weekly-action-dropdown').forEach(d => {
-                                if (d !== btn.nextElementSibling) d.classList.add('hidden');
-                            });
-                            const dropdown = btn.nextElementSibling;
-                            if (dropdown) {
-                                dropdown.classList.toggle('hidden');
-                                const mainMenu = dropdown.querySelector('.dropdown-main-menu');
-                                const rescheduleSec = dropdown.querySelector('.dropdown-reschedule-section');
-                                if (mainMenu && rescheduleSec) {
-                                    mainMenu.classList.remove('hidden');
-                                    rescheduleSec.classList.add('hidden');
+                            const dateInput = btn.nextElementSibling;
+                            if (dateInput) {
+                                if (typeof dateInput.showPicker === 'function') {
+                                    dateInput.showPicker();
+                                } else {
+                                    dateInput.focus();
+                                    dateInput.click();
                                 }
                             }
                         });
                     });
 
-                    // Postpone button click (switch to date picker view)
-                    card.querySelectorAll('.btn-postpone').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const dropdown = btn.closest('.weekly-action-dropdown');
-                            if (dropdown) {
-                                const mainMenu = dropdown.querySelector('.dropdown-main-menu');
-                                const rescheduleSec = dropdown.querySelector('.dropdown-reschedule-section');
-                                if (mainMenu && rescheduleSec) {
-                                    mainMenu.classList.add('hidden');
-                                    rescheduleSec.classList.remove('hidden');
-                                }
-                            }
-                        });
-                    });
-
-                    // Cancel Reschedule button click
-                    card.querySelectorAll('.btn-cancel-reschedule').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const dropdown = btn.closest('.weekly-action-dropdown');
-                            if (dropdown) {
-                                const mainMenu = dropdown.querySelector('.dropdown-main-menu');
-                                const rescheduleSec = dropdown.querySelector('.dropdown-reschedule-section');
-                                if (mainMenu && rescheduleSec) {
-                                    mainMenu.classList.remove('hidden');
-                                    rescheduleSec.classList.add('hidden');
-                                }
-                            }
-                        });
-                    });
-
-                    // Save Reschedule Click handler
-                    card.querySelectorAll('.btn-save-reschedule').forEach(btn => {
-                        btn.addEventListener('click', async (e) => {
-                            e.stopPropagation();
-                            const dbId = btn.getAttribute('data-id');
-                            const pedidoId = btn.getAttribute('data-pedido');
-                            const dropdown = btn.closest('.weekly-action-dropdown');
-                            const dateInput = dropdown ? dropdown.querySelector('.reschedule-date-input') : null;
-                            if (!dateInput) return;
-
-                            const newDate = dateInput.value;
+                    // Date Input Change Event (Auto-save)
+                    card.querySelectorAll('.reschedule-date-input-hidden').forEach(input => {
+                        input.addEventListener('change', async (e) => {
+                            const pedidoId = input.getAttribute('data-pedido');
+                            const newDate = input.value;
                             const finalDate = newDate ? newDate : null;
 
-                            try {
-                                btn.disabled = true;
-                                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                                
-                                // Atualizar por 'pedido' em vez de 'id', pois a chave do pedido é única comercialmente e está mapeada no dropdown
-                                await window.SupabaseService.updateDeliveryDateByPedido(pedidoId, finalDate);
-                                
-                                if (window.app && window.app.showNotification) {
-                                    if (finalDate) {
-                                        window.app.showNotification(`Pedido ${pedidoId} reagendado com sucesso para ${newDate.split('-').reverse().join('/')}!`, 'success');
-                                    } else {
-                                        window.app.showNotification(`Pedido ${pedidoId} removido do planejamento semanal!`, 'success');
-                                    }
-                                }
-                                
-                                if (dropdown) dropdown.classList.add('hidden');
+                            if (!finalDate) return;
 
-                                // Reload and update UI
+                            try {
+                                const triggerBtn = input.previousElementSibling;
+                                if (triggerBtn) {
+                                    triggerBtn.disabled = true;
+                                    triggerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                                }
+
+                                await window.SupabaseService.updateDeliveryDateByPedido(pedidoId, finalDate);
+
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification(`Pedido ${pedidoId} reagendado com sucesso para ${newDate.split('-').reverse().join('/')}!`, 'success');
+                                }
+
                                 if (window.app && window.app.loadData) {
                                     await window.app.loadData();
                                     this.renderPlan();
@@ -425,8 +374,39 @@
                                 if (window.app && window.app.showNotification) {
                                     window.app.showNotification(err.message || 'Erro ao reagendar pedido.', 'error');
                                 }
-                                btn.innerHTML = 'Salvar';
-                                btn.disabled = false;
+                                this.renderPlan();
+                            }
+                        });
+                    });
+
+                    // Remove from Planning Button Trigger
+                    card.querySelectorAll('.btn-remove-planning').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            const pedidoId = btn.getAttribute('data-pedido');
+                            
+                            if (confirm(`Deseja remover o pedido ${pedidoId} do planejamento semanal?`)) {
+                                try {
+                                    btn.disabled = true;
+                                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+                                    await window.SupabaseService.updateDeliveryDateByPedido(pedidoId, null);
+
+                                    if (window.app && window.app.showNotification) {
+                                        window.app.showNotification(`Pedido ${pedidoId} removido do planejamento semanal!`, 'success');
+                                    }
+
+                                    if (window.app && window.app.loadData) {
+                                        await window.app.loadData();
+                                        this.renderPlan();
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                    if (window.app && window.app.showNotification) {
+                                        window.app.showNotification(err.message || 'Erro ao remover pedido.', 'error');
+                                    }
+                                    this.renderPlan();
+                                }
                             }
                         });
                     });
