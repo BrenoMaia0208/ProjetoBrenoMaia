@@ -68,12 +68,14 @@
                             scale: 2.5, // Even higher resolution and crispness
                             useCORS: true,
                             logging: false,
+                            windowWidth: 1800, // Force simulated desktop window width to prevent vertical collapse on small screens
                             onclone: (clonedDoc) => {
                                 const clonedGrid = clonedDoc.getElementById('weekly-plan-grid');
                                 if (clonedGrid) {
                                     // 1. Force structural horizontal layout using inline-block + white-space nowrap (bypasses html2canvas flexbox/grid bugs)
                                     clonedGrid.style.display = 'block';
                                     clonedGrid.style.width = '1750px';
+                                    clonedGrid.style.minWidth = '1750px'; // guarantee minimum width of desktop layout
                                     clonedGrid.style.padding = '24px';
                                     clonedGrid.style.backgroundColor = '#f8fafc';
                                     clonedGrid.style.boxSizing = 'border-box';
