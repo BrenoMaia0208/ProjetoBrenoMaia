@@ -171,9 +171,15 @@ module.exports = async (req, res) => {
                 
                 if (id) {
                     if (typeof id === 'string' && id.includes(',')) {
-                        query = query.in('id', id.split(','));
+                        const parsedIds = id.split(',').map(x => {
+                            const trimmed = x.trim();
+                            return /^\d+$/.test(trimmed) ? Number(trimmed) : trimmed;
+                        });
+                        query = query.in('id', parsedIds);
                     } else {
-                        query = query.eq('id', id);
+                        const trimmedId = String(id).trim();
+                        const parsedId = /^\d+$/.test(trimmedId) ? Number(trimmedId) : trimmedId;
+                        query = query.eq('id', parsedId);
                     }
                 } else if (pedido && !isNaN(pedido) && pedido.trim() !== '') {
                     query = query.eq('pedido', Number(pedido));
@@ -282,11 +288,21 @@ module.exports = async (req, res) => {
             
             if (id) {
                 if (Array.isArray(id)) {
-                    query = query.in('id', id);
+                    const parsedIds = id.map(x => {
+                        const s = String(x).trim();
+                        return /^\d+$/.test(s) ? Number(s) : s;
+                    });
+                    query = query.in('id', parsedIds);
                 } else if (typeof id === 'string' && id.includes(',')) {
-                    query = query.in('id', id.split(','));
+                    const parsedIds = id.split(',').map(x => {
+                        const trimmed = x.trim();
+                        return /^\d+$/.test(trimmed) ? Number(trimmed) : trimmed;
+                    });
+                    query = query.in('id', parsedIds);
                 } else {
-                    query = query.eq('id', id);
+                    const trimmedId = String(id).trim();
+                    const parsedId = /^\d+$/.test(trimmedId) ? Number(trimmedId) : trimmedId;
+                    query = query.eq('id', parsedId);
                 }
             } else if (pedido && !isNaN(pedido) && String(pedido).trim() !== '') {
                 query = query.eq('pedido', Number(pedido));
