@@ -71,28 +71,33 @@
                             onclone: (clonedDoc) => {
                                 const clonedGrid = clonedDoc.getElementById('weekly-plan-grid');
                                 if (clonedGrid) {
-                                    // 1. Force the critical structural styles inline on the clone
-                                    clonedGrid.style.display = 'flex';
-                                    clonedGrid.style.flexDirection = 'row';
-                                    clonedGrid.style.flexWrap = 'nowrap';
+                                    // 1. Force structural horizontal layout using inline-block + white-space nowrap (bypasses html2canvas flexbox/grid bugs)
+                                    clonedGrid.style.display = 'block';
                                     clonedGrid.style.width = '1750px';
-                                    clonedGrid.style.gap = '20px';
                                     clonedGrid.style.padding = '24px';
                                     clonedGrid.style.backgroundColor = '#f8fafc';
+                                    clonedGrid.style.boxSizing = 'border-box';
+                                    clonedGrid.style.whiteSpace = 'nowrap';
 
                                     // Expand scrollable lists and card containers inline
                                     clonedGrid.querySelectorAll('.weekly-deliveries-list').forEach(list => {
                                         list.style.maxHeight = 'none';
                                         list.style.overflow = 'visible';
                                         list.style.overflowY = 'visible';
+                                        list.style.display = 'block';
                                     });
 
-                                    clonedGrid.querySelectorAll('.weekly-day-card').forEach(card => {
+                                    clonedGrid.querySelectorAll('.weekly-day-card').forEach((card, idx, arr) => {
+                                        card.style.display = 'inline-block';
+                                        card.style.width = '320px';
+                                        card.style.marginRight = idx === arr.length - 1 ? '0px' : '18px';
+                                        card.style.verticalAlign = 'top';
+                                        card.style.whiteSpace = 'normal'; // restore normal text wrapping inside card
                                         card.style.height = 'auto';
                                         card.style.maxHeight = 'none';
                                         card.style.overflow = 'visible';
                                         card.style.minHeight = '480px';
-                                        card.style.flex = '1';
+                                        card.style.boxSizing = 'border-box';
                                     });
 
                                     // Hide administrative action buttons inline
@@ -112,16 +117,19 @@
                                     const style = clonedDoc.createElement('style');
                                     style.innerHTML = `
                                         #weekly-plan-grid {
-                                            display: flex !important;
-                                            flex-direction: row !important;
-                                            flex-wrap: nowrap !important;
+                                            display: block !important;
                                             width: 1750px !important;
-                                            gap: 20px !important;
                                             padding: 24px !important;
                                             background-color: #f8fafc !important;
+                                            box-sizing: border-box !important;
+                                            white-space: nowrap !important;
                                         }
                                         .weekly-day-card {
-                                            flex: 1 !important;
+                                            display: inline-block !important;
+                                            width: 320px !important;
+                                            margin-right: 18px !important;
+                                            vertical-align: top !important;
+                                            white-space: normal !important;
                                             background: #ffffff !important;
                                             border: 2px solid #cbd5e1 !important;
                                             border-radius: 16px !important;
@@ -130,9 +138,10 @@
                                             max-height: none !important;
                                             min-height: 480px !important;
                                             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
-                                            display: flex !important;
-                                            flex-direction: column !important;
-                                            gap: 16px !important;
+                                            box-sizing: border-box !important;
+                                        }
+                                        .weekly-day-card:last-child {
+                                            margin-right: 0 !important;
                                         }
                                         .weekly-day-header {
                                             font-size: 1.15rem !important;
@@ -140,6 +149,9 @@
                                             color: #0f172a !important;
                                             padding-bottom: 14px !important;
                                             border-bottom: 2px dashed #cbd5e1 !important;
+                                            display: flex !important;
+                                            justify-content: space-between !important;
+                                            align-items: center !important;
                                         }
                                         .weekly-day-header .day-total {
                                             font-size: 0.9rem !important;
@@ -148,27 +160,39 @@
                                             color: #0f172a !important;
                                             border-radius: 20px !important;
                                             font-weight: 700 !important;
+                                            display: inline-block !important;
                                         }
                                         .weekly-deliveries-list {
                                             max-height: none !important;
                                             overflow: visible !important;
                                             overflow-y: visible !important;
-                                            gap: 14px !important;
-                                            display: flex !important;
-                                            flex-direction: column !important;
+                                            margin-top: 14px !important;
+                                            display: block !important;
                                         }
                                         .weekly-delivery-item {
                                             border: 1.5px solid #cbd5e1 !important;
                                             border-radius: 12px !important;
                                             padding: 16px !important;
-                                            gap: 12px !important;
+                                            margin-bottom: 14px !important;
                                             background: #ffffff !important;
                                             box-shadow: none !important;
+                                            display: block !important;
+                                        }
+                                        .weekly-delivery-item:last-child {
+                                            margin-bottom: 0 !important;
+                                        }
+                                        .weekly-delivery-header-row {
+                                            display: flex !important;
+                                            justify-content: space-between !important;
+                                            align-items: center !important;
+                                            margin-bottom: 10px !important;
                                         }
                                         .delivery-cidade {
                                             font-size: 1rem !important;
                                             font-weight: 800 !important;
                                             color: #0f172a !important;
+                                            display: inline-flex !important;
+                                            align-items: center !important;
                                         }
                                         .weekly-delivery-details {
                                             background: #f1f5f9 !important;
@@ -178,10 +202,13 @@
                                             display: flex !important;
                                             flex-direction: column !important;
                                             gap: 6px !important;
+                                            margin-bottom: 10px !important;
                                         }
                                         .detail-line {
                                             font-size: 0.85rem !important;
                                             color: #475569 !important;
+                                            display: flex !important;
+                                            justify-content: space-between !important;
                                         }
                                         .detail-line strong {
                                             color: #0f172a !important;
@@ -190,6 +217,9 @@
                                         .weekly-delivery-footer {
                                             padding-top: 12px !important;
                                             border-top: 1.5px dashed #cbd5e1 !important;
+                                            display: flex !important;
+                                            justify-content: space-between !important;
+                                            align-items: center !important;
                                         }
                                         .delivery-value {
                                             font-size: 1rem !important;
@@ -198,11 +228,14 @@
                                         }
                                         .weekly-delivery-checkbox-container {
                                             cursor: default !important;
+                                            display: inline-flex !important;
+                                            align-items: center !important;
                                         }
                                         .weekly-delivery-checkbox-container .status-label {
                                             font-size: 0.8rem !important;
                                             padding: 4px 10px !important;
                                             font-weight: 700 !important;
+                                            border-radius: 20px !important;
                                         }
                                         .weekly-delivery-checkbox-container .status-label.status-ok {
                                             color: #047857 !important;
