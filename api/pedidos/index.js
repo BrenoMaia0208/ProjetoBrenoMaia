@@ -73,7 +73,8 @@ module.exports = async (req, res) => {
             let query = supabase
                 .from('pedidos')
                 .select('*')
-                .order('data_pedido', { ascending: false });
+                .order('data_pedido', { ascending: false })
+                .range(0, 5000);
 
             // Global search
             if (filters.search) {

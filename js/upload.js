@@ -622,17 +622,29 @@
                 // Buscar pedidos atuais para preservar alterações de data do dashboard
                 let existingPedidos = [];
                 try {
-                    existingPedidos = await window.SupabaseService.fetchPedidos();
+                    existingPedidos = await window.SupabaseService.fetchPedidos({});
                 } catch (err) {
                     console.warn('Erro ao carregar pedidos para preservar datas:', err);
                 }
 
+                const normalizePedido = (val) => {
+                    if (val === null || val === undefined) return '';
+                    let str = String(val).trim().toLowerCase();
+                    if (str.endsWith('.0')) {
+                        str = str.substring(0, str.length - 2);
+                    }
+                    return str;
+                };
+
+                console.log(`[Import] Carregados ${existingPedidos.length} pedidos atuais do banco.`);
+
                 // Mapear datas de entrega atuais pelo código do pedido
                 const preservedDatesMap = {};
                 existingPedidos.forEach(p => {
-                    if (p.pedido) {
+                    const normPedido = normalizePedido(p.pedido);
+                    if (normPedido) {
                         // Salva o valor de data_entrega (pode ser data válida ou null/remover)
-                        preservedDatesMap[String(p.pedido).trim()] = p.data_entrega;
+                        preservedDatesMap[normPedido] = p.data_entrega;
                     }
                 });
                 
@@ -645,12 +657,15 @@
                 progressFill.style.width = '30%';
 
                 // Sobrescrever as datas da planilha com as que estavam salvas no painel
+                let matchedCount = 0;
                 this.validatedRows.forEach(row => {
-                    const pedCode = String(row.pedido).trim();
-                    if (preservedDatesMap.hasOwnProperty(pedCode)) {
-                        row.data_entrega = preservedDatesMap[pedCode];
+                    const normPedido = normalizePedido(row.pedido);
+                    if (normPedido && preservedDatesMap.hasOwnProperty(normPedido)) {
+                        row.data_entrega = preservedDatesMap[normPedido];
+                        matchedCount++;
                     }
                 });
+                console.log(`[Import] Mesclagem concluída: ${matchedCount} datas de entrega preservadas das ${this.validatedRows.length} linhas importadas.`);
 
                 const onProgress = (percent) => {
                     const mappedPercent = 30 + (percent * 0.7); // escala de 30% a 100%
