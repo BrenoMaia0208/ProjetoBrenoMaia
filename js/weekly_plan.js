@@ -554,28 +554,26 @@
 
                 const isAdmin = window.SupabaseService && window.SupabaseService.isAdmin();
 
-                // Group dayPedidos by Cidade, Programa, Grupo
+                // Group dayPedidos by Cidade
                 const subGrouped = {};
                 dayPedidos.forEach(p => {
                     const cidade = (p.cidade || 'Não informada').trim();
-                    const programa = (p.programa || '-').trim();
-                    const grupo = (p.grupo || '-').trim();
-                    const groupKey = `${cidade}|${programa}|${grupo}`;
-
-                    if (!subGrouped[groupKey]) {
-                        subGrouped[groupKey] = {
+                    if (!subGrouped[cidade]) {
+                        subGrouped[cidade] = {
                             cidade: cidade,
-                            programa: programa,
-                            grupo: grupo,
                             data_entrega: p.data_entrega,
                             total_pedido: 0,
-                            ids: [],
-                            pedidos: []
+                            items: []
                         };
                     }
-                    subGrouped[groupKey].total_pedido += (p.total_pedido || 0);
-                    subGrouped[groupKey].ids.push(p.id);
-                    subGrouped[groupKey].pedidos.push(p.pedido);
+                    subGrouped[cidade].total_pedido += (p.total_pedido || 0);
+                    subGrouped[cidade].items.push({
+                        id: p.id,
+                        pedido: p.pedido,
+                        programa: (p.programa || '-').trim(),
+                        grupo: (p.grupo || '-').trim(),
+                        total_pedido: p.total_pedido || 0
+                    });
                 });
 
                 const uniqueGroups = Object.values(subGrouped);
@@ -585,9 +583,8 @@
                     deliveriesHtml = `<div style="text-align: center; padding: 2rem 0; color: #64748b; font-size: 0.85rem; font-style: italic;">Nenhuma entrega</div>`;
                 } else {
                     uniqueGroups.forEach(g => {
-                        const isChecked = g.pedidos.every(ped => !!this.checkedState[ped]);
-                        const idsString = g.ids.join(',');
-                        const pedidosString = g.pedidos.join(',');
+                        const pedidosString = g.items.map(item => item.pedido).join(',');
+                        const isChecked = g.items.every(item => !!this.checkedState[item.pedido]);
 
                         const actionBtnHtml = isAdmin ? `
                             <div class="weekly-reschedule-actions" style="display: flex; align-items: center; gap: 6px; position: relative;">
@@ -617,6 +614,15 @@
                             </div>
                         `;
 
+                        // Render each consolidated order detail row inside the card
+                        const detailsHtml = g.items.map((item, idx) => `
+                            <div class="delivery-sub-item" style="${idx > 0 ? 'margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(15, 23, 42, 0.06);' : ''}">
+                                <div class="detail-line"><span style="color: #64748b;">Programa:</span> <strong style="color: var(--text-primary);">${item.programa}</strong></div>
+                                <div class="detail-line"><span style="color: #64748b;">Grupo:</span> <strong style="color: var(--text-primary);">${item.grupo}</strong></div>
+                                <div class="detail-line" style="margin-top: 2px;"><span style="color: #64748b;">Valor:</span> <strong style="color: var(--text-primary);">${formatCurrency(item.total_pedido)}</strong></div>
+                            </div>
+                        `).join('');
+
                         deliveriesHtml += `
                             <div class="weekly-delivery-item" data-pedido="${pedidosString}">
                                 <div class="weekly-delivery-header-row">
@@ -625,12 +631,11 @@
                                     </span>
                                     ${actionBtnHtml}
                                 </div>
-                                <div class="weekly-delivery-details">
-                                    <div class="detail-line"><span>Programa:</span> <strong>${g.programa}</strong></div>
-                                    <div class="detail-line"><span>Grupo:</span> <strong>${g.grupo}</strong></div>
+                                <div class="weekly-delivery-details" style="display: flex; flex-direction: column; gap: 4px;">
+                                    ${detailsHtml}
                                 </div>
                                 <div class="weekly-delivery-footer">
-                                    <span class="delivery-value">${formatCurrency(g.total_pedido)}</span>
+                                    <span class="delivery-value" title="Valor total consolidado da cidade">${formatCurrency(g.total_pedido)}</span>
                                     ${checkboxHtml}
                                 </div>
                             </div>
