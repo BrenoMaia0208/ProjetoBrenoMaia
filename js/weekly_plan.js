@@ -64,46 +64,125 @@
 
                         // Run html2canvas with onclone to perform clean layout alterations and animation bypass on the clone
                         const canvas = await html2canvas(grid, {
-                            backgroundColor: '#f1f5f9', // soft background matching the app
-                            scale: 2, // high quality
+                            backgroundColor: '#f8fafc', // Clean, clear background
+                            scale: 2.5, // Even higher resolution and crispness
                             useCORS: true,
                             logging: false,
                             onclone: (clonedDoc) => {
-                                const clonedGrid = clonedDoc.getElementById('weekly-plan-grid');
-                                if (clonedGrid) {
-                                    // 1. Force clean flexbox layout for side-by-side columns
-                                    clonedGrid.style.display = 'flex';
-                                    clonedGrid.style.flexDirection = 'row';
-                                    clonedGrid.style.flexWrap = 'nowrap';
-                                    clonedGrid.style.width = '1650px'; // Standard desktop layout width
-                                    clonedGrid.style.gap = '18px';
-                                    clonedGrid.style.padding = '10px';
-
-                                    // 2. Expand scrollable lists and card containers
-                                    clonedGrid.querySelectorAll('.weekly-deliveries-list').forEach(list => {
-                                        list.style.maxHeight = 'none';
-                                        list.style.overflow = 'visible';
-                                        list.style.overflowY = 'visible';
-                                    });
-
-                                    clonedGrid.querySelectorAll('.weekly-day-card').forEach(card => {
-                                        card.style.height = 'auto';
-                                        card.style.maxHeight = 'none';
-                                        card.style.overflow = 'visible';
-                                        card.style.minHeight = '420px';
-                                        card.style.flex = '1';
-                                    });
-
-                                    // 3. Disable animations, transitions, and restore full opacity/transforms
-                                    // This fixes the issue where fade-in animations on day cards render as blank/opacity 0
-                                    const allClonedElements = clonedGrid.querySelectorAll('*');
-                                    allClonedElements.forEach(el => {
-                                        el.style.animation = 'none';
-                                        el.style.transition = 'none';
-                                        el.style.transform = 'none';
-                                        el.style.opacity = '1';
-                                    });
-                                }
+                                // Inject high-legibility CSS overrides specifically for the exported image clone
+                                const style = clonedDoc.createElement('style');
+                                style.innerHTML = `
+                                    #weekly-plan-grid {
+                                        display: flex !important;
+                                        flex-direction: row !important;
+                                        flex-wrap: nowrap !important;
+                                        width: 1750px !important;
+                                        gap: 20px !important;
+                                        padding: 24px !important;
+                                        background-color: #f8fafc !important;
+                                    }
+                                    .weekly-day-card {
+                                        flex: 1 !important;
+                                        background: #ffffff !important;
+                                        border: 2px solid #cbd5e1 !important; /* higher contrast border */
+                                        border-radius: 16px !important;
+                                        padding: 20px !important;
+                                        height: auto !important;
+                                        max-height: none !important;
+                                        min-height: 480px !important;
+                                        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+                                        display: flex !important;
+                                        flex-direction: column !important;
+                                        gap: 16px !important;
+                                    }
+                                    .weekly-day-header {
+                                        font-size: 1.15rem !important; /* larger day title */
+                                        font-weight: 800 !important;
+                                        color: #0f172a !important;
+                                        padding-bottom: 14px !important;
+                                        border-bottom: 2px dashed #cbd5e1 !important;
+                                    }
+                                    .weekly-day-header .day-total {
+                                        font-size: 0.9rem !important; /* clear total sum badge */
+                                        padding: 6px 12px !important;
+                                        background: #e2e8f0 !important;
+                                        color: #0f172a !important;
+                                        border-radius: 20px !important;
+                                        font-weight: 700 !important;
+                                    }
+                                    .weekly-deliveries-list {
+                                        max-height: none !important;
+                                        overflow: visible !important;
+                                        overflow-y: visible !important;
+                                        gap: 14px !important;
+                                        display: flex !important;
+                                        flex-direction: column !important;
+                                    }
+                                    .weekly-delivery-item {
+                                        border: 1.5px solid #cbd5e1 !important; /* high contrast delivery border */
+                                        border-radius: 12px !important;
+                                        padding: 16px !important;
+                                        gap: 12px !important;
+                                        background: #ffffff !important;
+                                        box-shadow: none !important;
+                                    }
+                                    .delivery-cidade {
+                                        font-size: 1rem !important; /* larger, bold city name */
+                                        font-weight: 800 !important;
+                                        color: #0f172a !important;
+                                    }
+                                    .weekly-delivery-details {
+                                        background: #f1f5f9 !important; /* clean detail container background */
+                                        padding: 12px !important;
+                                        border-radius: 10px !important;
+                                        border: 1px solid #e2e8f0 !important;
+                                        display: flex !important;
+                                        flex-direction: column !important;
+                                        gap: 6px !important;
+                                    }
+                                    .detail-line {
+                                        font-size: 0.85rem !important; /* larger details */
+                                        color: #475569 !important;
+                                    }
+                                    .detail-line strong {
+                                        color: #0f172a !important;
+                                        font-weight: 700 !important;
+                                    }
+                                    .weekly-delivery-footer {
+                                        padding-top: 12px !important;
+                                        border-top: 1.5px dashed #cbd5e1 !important;
+                                    }
+                                    .delivery-value {
+                                        font-size: 1rem !important; /* larger currency text */
+                                        color: #0f172a !important;
+                                        font-weight: 800 !important;
+                                    }
+                                    .weekly-delivery-checkbox-container {
+                                        cursor: default !important;
+                                    }
+                                    .weekly-delivery-checkbox-container .status-label {
+                                        font-size: 0.8rem !important; /* larger status label */
+                                        padding: 4px 10px !important;
+                                        font-weight: 700 !important;
+                                    }
+                                    .weekly-delivery-checkbox-container .status-label.status-ok {
+                                        color: #047857 !important;
+                                        background: rgba(16, 185, 129, 0.12) !important;
+                                        border-color: rgba(16, 185, 129, 0.2) !important;
+                                    }
+                                    /* Hide administrative action buttons completely in the image */
+                                    .weekly-reschedule-actions {
+                                        display: none !important;
+                                    }
+                                    /* Bypass opacity-0 animations and transition shifts */
+                                    * {
+                                        animation: none !important;
+                                        transition: none !important;
+                                        transform: none !important;
+                                        opacity: 1 !important;
+                                    }
+                                `;
+                                clonedDoc.head.appendChild(style);
                             }
                         });
 
