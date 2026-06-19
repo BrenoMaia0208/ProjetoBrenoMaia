@@ -245,8 +245,7 @@ module.exports = async (req, res) => {
             (allRows || []).forEach(row => {
                 const statusUpper = String(row.status_venda || '').toUpperCase();
                 const isDelivered = 
-                    ['FATURADO TOTAL', 'FATURADO', 'ENTREGUE'].includes(statusUpper) || 
-                    row.saldo_faturar === 0;
+                    ['FATURADO TOTAL', 'FATURADO', 'ENTREGUE'].includes(statusUpper);
 
                 if (!isDelivered) {
                     // Pedidos ativos são sempre excluídos para dar lugar aos dados da nova planilha
