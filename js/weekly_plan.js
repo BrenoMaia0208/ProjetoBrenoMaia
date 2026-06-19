@@ -121,7 +121,7 @@
                                         #weekly-plan-grid {
                                             display: block !important;
                                             width: 1750px !important;
-                                            padding: 24px !important;
+                                            padding: 28px !important;
                                             background-color: #f8fafc !important;
                                             box-sizing: border-box !important;
                                             white-space: nowrap !important;
@@ -133,51 +133,51 @@
                                             vertical-align: top !important;
                                             white-space: normal !important;
                                             background: #ffffff !important;
-                                            border: 2px solid #cbd5e1 !important;
+                                            border: 3px solid #94a3b8 !important; /* Thicker high-contrast border */
                                             border-radius: 16px !important;
-                                            padding: 20px !important;
+                                            padding: 22px !important;
                                             height: auto !important;
                                             max-height: none !important;
-                                            min-height: 480px !important;
-                                            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+                                            min-height: 500px !important;
+                                            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05) !important;
                                             box-sizing: border-box !important;
                                         }
                                         .weekly-day-card:last-child {
                                             margin-right: 0 !important;
                                         }
                                         .weekly-day-header {
-                                            font-size: 1.15rem !important;
+                                            font-size: 1.45rem !important; /* Much larger title */
                                             font-weight: 800 !important;
                                             color: #0f172a !important;
-                                            padding-bottom: 14px !important;
-                                            border-bottom: 2px dashed #cbd5e1 !important;
+                                            padding-bottom: 16px !important;
+                                            border-bottom: 3px dashed #cbd5e1 !important;
                                             display: flex !important;
                                             justify-content: space-between !important;
                                             align-items: center !important;
                                         }
                                         .weekly-day-header .day-total {
-                                            font-size: 0.9rem !important;
-                                            padding: 6px 12px !important;
-                                            background: #e2e8f0 !important;
-                                            color: #0f172a !important;
+                                            font-size: 1.1rem !important; /* Larger day total badge */
+                                            padding: 6px 14px !important;
+                                            background: #0f172a !important; /* High contrast total */
+                                            color: #ffffff !important;
                                             border-radius: 20px !important;
-                                            font-weight: 700 !important;
+                                            font-weight: 800 !important;
                                             display: inline-block !important;
                                         }
                                         .weekly-deliveries-list {
                                             max-height: none !important;
                                             overflow: visible !important;
                                             overflow-y: visible !important;
-                                            margin-top: 14px !important;
+                                            margin-top: 18px !important;
                                             display: block !important;
                                         }
                                         .weekly-delivery-item {
-                                            border: 1.5px solid #cbd5e1 !important;
-                                            border-radius: 12px !important;
-                                            padding: 16px !important;
-                                            margin-bottom: 14px !important;
+                                            border: 2px solid #64748b !important; /* Darker border for legibility */
+                                            border-radius: 14px !important;
+                                            padding: 18px !important;
+                                            margin-bottom: 16px !important;
                                             background: #ffffff !important;
-                                            box-shadow: none !important;
+                                            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.02) !important;
                                             display: block !important;
                                         }
                                         .weekly-delivery-item:last-child {
@@ -187,46 +187,46 @@
                                             display: flex !important;
                                             justify-content: space-between !important;
                                             align-items: center !important;
-                                            margin-bottom: 10px !important;
+                                            margin-bottom: 12px !important;
                                         }
                                         .delivery-cidade {
-                                            font-size: 1rem !important;
-                                            font-weight: 800 !important;
+                                            font-size: 1.25rem !important; /* Very large city name */
+                                            font-weight: 900 !important;
                                             color: #0f172a !important;
                                             display: inline-flex !important;
                                             align-items: center !important;
                                         }
                                         .weekly-delivery-details {
-                                            background: #f1f5f9 !important;
-                                            padding: 12px !important;
-                                            border-radius: 10px !important;
-                                            border: 1px solid #e2e8f0 !important;
+                                            background: #f8fafc !important; /* Clean contrasting background */
+                                            padding: 14px !important;
+                                            border-radius: 12px !important;
+                                            border: 2px solid #cbd5e1 !important;
                                             display: flex !important;
                                             flex-direction: column !important;
-                                            gap: 6px !important;
-                                            margin-bottom: 10px !important;
+                                            gap: 8px !important;
+                                            margin-bottom: 12px !important;
                                         }
                                         .detail-line {
-                                            font-size: 0.85rem !important;
-                                            color: #475569 !important;
+                                            font-size: 1.05rem !important; /* Clean readable detail text */
+                                            color: #334155 !important;
                                             display: flex !important;
                                             justify-content: space-between !important;
                                         }
                                         .detail-line strong {
                                             color: #0f172a !important;
-                                            font-weight: 700 !important;
+                                            font-weight: 800 !important;
                                         }
                                         .weekly-delivery-footer {
-                                            padding-top: 12px !important;
-                                            border-top: 1.5px dashed #cbd5e1 !important;
+                                            padding-top: 14px !important;
+                                            border-top: 2px dashed #cbd5e1 !important;
                                             display: flex !important;
                                             justify-content: space-between !important;
                                             align-items: center !important;
                                         }
                                         .delivery-value {
-                                            font-size: 1rem !important;
+                                            font-size: 1.25rem !important; /* Highlighted value */
                                             color: #0f172a !important;
-                                            font-weight: 800 !important;
+                                            font-weight: 900 !important;
                                         }
                                         .weekly-delivery-checkbox-container {
                                             cursor: default !important;
@@ -234,15 +234,15 @@
                                             align-items: center !important;
                                         }
                                         .weekly-delivery-checkbox-container .status-label {
-                                            font-size: 0.8rem !important;
-                                            padding: 4px 10px !important;
-                                            font-weight: 700 !important;
+                                            font-size: 0.95rem !important; /* Large readable label */
+                                            padding: 6px 12px !important;
+                                            font-weight: 800 !important;
                                             border-radius: 20px !important;
                                         }
                                         .weekly-delivery-checkbox-container .status-label.status-ok {
                                             color: #047857 !important;
-                                            background: rgba(16, 185, 129, 0.12) !important;
-                                            border-color: rgba(16, 185, 129, 0.2) !important;
+                                            background: rgba(16, 185, 129, 0.15) !important;
+                                            border-color: rgba(16, 185, 129, 0.25) !important;
                                         }
                                         .weekly-reschedule-actions {
                                             display: none !important;
