@@ -385,6 +385,9 @@
                          'total_romaneio', 'total_faturado', 'saldo_faturar', 'total_despachado', 'saldo_despacho']
                          .includes(dbCol)) {
                         row[dbCol] = parseNumber(val);
+                    } else if (['data_entrega', 'data_pedido', 'data_liberacao', 'data_entrega_anterior', 
+                              'dt_ult_fornecedor', 'dt_previsao_fornecedor'].includes(dbCol)) {
+                        row[dbCol] = formatDateObj(val);
                     } else if (dbCol === 'pedido') {
                         if (val !== null && val !== undefined) {
                             let pStr = String(val).trim();
