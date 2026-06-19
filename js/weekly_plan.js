@@ -60,7 +60,7 @@
 
                     try {
                         exportImgBtn.disabled = true;
-                        exportImgBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Exportando...';
+                        exportImgBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Copiando...';
 
                         // 1. Temporarily expand all day card scrollable lists so all items are visible
                         const lists = grid.querySelectorAll('.weekly-deliveries-list');
@@ -111,18 +111,33 @@
                             s.element.style.overflow = s.overflow;
                         });
 
-                        // 4. Trigger download
-                        const image = canvas.toDataURL('image/png');
-                        const link = document.createElement('a');
-                        const datesBadge = document.getElementById('weekly-plan-dates');
-                        const weekStr = datesBadge ? datesBadge.textContent.replace(/\s+/g, '_').replace(/\//g, '-') : 'semana';
-                        link.download = `Planejamento_Semanal_${weekStr}.png`;
-                        link.href = image;
-                        link.click();
+                        // 4. Copy to Clipboard
+                        canvas.toBlob(async (blob) => {
+                            try {
+                                await navigator.clipboard.write([
+                                    new ClipboardItem({
+                                        [blob.type]: blob
+                                    })
+                                ]);
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification('Imagem copiada para a área de transferência! Cole no WhatsApp (Ctrl+V).', 'success');
+                                }
+                            } catch (clipErr) {
+                                console.error('Clipboard copy failed, falling back to download:', clipErr);
+                                // Fallback to download
+                                const image = canvas.toDataURL('image/png');
+                                const link = document.createElement('a');
+                                const datesBadge = document.getElementById('weekly-plan-dates');
+                                const weekStr = datesBadge ? datesBadge.textContent.replace(/\s+/g, '_').replace(/\//g, '-') : 'semana';
+                                link.download = `Planejamento_Semanal_${weekStr}.png`;
+                                link.href = image;
+                                link.click();
+                                if (window.app && window.app.showNotification) {
+                                    window.app.showNotification('Clipboard bloqueado. Baixando arquivo da imagem...', 'info');
+                                }
+                            }
+                        }, 'image/png');
 
-                        if (window.app && window.app.showNotification) {
-                            window.app.showNotification('Imagem exportada com sucesso!', 'success');
-                        }
                     } catch (err) {
                         console.error('Error exporting image:', err);
                         if (window.app && window.app.showNotification) {
@@ -130,7 +145,96 @@
                         }
                     } finally {
                         exportImgBtn.disabled = false;
-                        exportImgBtn.innerHTML = '<i class="fa-solid fa-image"></i> Exportar Imagem';
+                        exportImgBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copiar Imagem (WhatsApp)';
+                    }
+                });
+            }
+
+            const copyTextBtn = document.getElementById('weekly-plan-copy-txt-btn');
+            if (copyTextBtn) {
+                copyTextBtn.addEventListener('click', () => {
+                    try {
+                        const datesBadge = document.getElementById('weekly-plan-dates');
+                        const weekTotalEl = document.getElementById('weekly-plan-total-value');
+                        const weekRange = datesBadge ? datesBadge.textContent : '';
+                        const weekTotal = weekTotalEl ? weekTotalEl.textContent : '';
+                        
+                        let text = `📅 *PLANEJAMENTO DE ENTREGA SEMANAL (${weekRange})*\n`;
+                        text += `💰 *Soma das Entregas na Semana:* ${weekTotal}\n\n`;
+
+                        const weekdays = [
+                            { key: 'Segunda', name: 'SEGUNDA-FEIRA' },
+                            { key: 'Terça', name: 'TERÇA-FEIRA' },
+                            { key: 'Quarta', name: 'QUARTA-FEIRA' },
+                            { key: 'Quinta', name: 'QUINTA-FEIRA' },
+                            { key: 'Sexta', name: 'SEXTA-FEIRA' }
+                        ];
+
+                        const grouped = {
+                            'Segunda': [],
+                            'Terça': [],
+                            'Quarta': [],
+                            'Quinta': [],
+                            'Sexta': []
+                        };
+
+                        this.weeklyPedidos.forEach(p => {
+                            const dayName = this.getDayName(p.data_entrega);
+                            if (grouped[dayName]) {
+                                grouped[dayName].push(p);
+                            }
+                        });
+
+                        weekdays.forEach(day => {
+                            const dayPedidos = grouped[day.key] || [];
+                            const dayTotal = dayPedidos.reduce((sum, p) => sum + (p.total_pedido || 0), 0);
+                            const dayTotalFormatted = dayTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                            text += `*${day.name}* (Total: ${dayTotalFormatted})\n`;
+
+                            if (dayPedidos.length === 0) {
+                                text += `_Nenhuma entrega planejada_\n`;
+                            } else {
+                                const subGrouped = {};
+                                dayPedidos.forEach(p => {
+                                    const cidade = (p.cidade || 'Não informada').trim();
+                                    const programa = (p.programa || '-').trim();
+                                    const grupo = (p.grupo || '-').trim();
+                                    const groupKey = `${cidade}|${programa}|${grupo}`;
+
+                                    if (!subGrouped[groupKey]) {
+                                        subGrouped[groupKey] = {
+                                            cidade: cidade,
+                                            programa: programa,
+                                            grupo: grupo,
+                                            total_pedido: 0,
+                                            pedidos: []
+                                        };
+                                    }
+                                    subGrouped[groupKey].total_pedido += (p.total_pedido || 0);
+                                    subGrouped[groupKey].pedidos.push(p.pedido);
+                                });
+
+                                Object.values(subGrouped).forEach(g => {
+                                    const isChecked = g.pedidos.every(ped => !!this.checkedState[ped]);
+                                    const statusIcon = isChecked ? '✅' : '⏳';
+                                    const statusText = isChecked ? 'Realizada' : 'Pendente';
+                                    const valFormatted = g.total_pedido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                                    text += `${statusIcon} *${g.cidade}* | Prog: ${g.programa} | Grupo: ${g.grupo} | ${valFormatted} (${statusText})\n`;
+                                });
+                            }
+                            text += `\n`;
+                        });
+
+                        navigator.clipboard.writeText(text.trim());
+                        if (window.app && window.app.showNotification) {
+                            window.app.showNotification('Texto formatado copiado! Cole no WhatsApp (Ctrl+V).', 'success');
+                        }
+                    } catch (err) {
+                        console.error('Failed to copy text:', err);
+                        if (window.app && window.app.showNotification) {
+                            window.app.showNotification('Erro ao copiar texto.', 'error');
+                        }
                     }
                 });
             }
