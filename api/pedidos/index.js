@@ -16,9 +16,10 @@ module.exports = async (req, res) => {
     }
 
     const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+    const anonKey = process.env.SUPABASE_ANON_KEY;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabaseUrl || !anonKey) {
         return res.status(500).json({ error: 'Supabase credentials are not configured on Vercel' });
     }
 
@@ -32,7 +33,13 @@ module.exports = async (req, res) => {
         };
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey, clientOptions);
+    // Always use anon client with user headers to verify the user identity
+    const authSupabase = createClient(supabaseUrl, anonKey, clientOptions);
+
+    // If service role key exists, use it to bypass RLS for database writes/reads
+    const dbKey = serviceRoleKey || anonKey;
+    const dbOptions = serviceRoleKey ? {} : clientOptions;
+    const supabase = createClient(supabaseUrl, dbKey, dbOptions);
 
     // Function to verify Admin Authorization using the Bearer Token
     const verifyAdmin = async () => {
@@ -42,7 +49,7 @@ module.exports = async (req, res) => {
         }
 
         const token = authHeader.substring(7);
-        const { data: { user }, error } = await supabase.auth.getUser(token);
+        const { data: { user }, error } = await authSupabase.auth.getUser(token);
 
         if (error || !user) {
             throw new Error('Acesso negado: Sessão de usuário inválida ou expirada.');
@@ -287,34 +294,57 @@ module.exports = async (req, res) => {
 
             let query = supabase.from('pedidos').update({ data_entrega: data_entrega || null });
             
+            const cleanPedidoVal = (val) => {
+                if (val === null || val === undefined) return '';
+                let str = String(val).trim();
+                if (str.endsWith('.0')) {
+                    str = str.substring(0, str.length - 2);
+                }
+                return str;
+            };
+
             if (id) {
+                // Se for um array de IDs ou uma string de IDs separados por vírgula (agrupamento do planejamento semanal)
                 if (Array.isArray(id)) {
-                    const parsedIds = id.map(x => {
-                        const s = String(x).trim();
-                        return /^\d+$/.test(s) ? Number(s) : s;
-                    });
+                    const parsedIds = id.map(x => Number(String(x).trim())).filter(x => !isNaN(x));
                     query = query.in('id', parsedIds);
                 } else if (typeof id === 'string' && id.includes(',')) {
-                    const parsedIds = id.split(',').map(x => {
-                        const trimmed = x.trim();
-                        return /^\d+$/.test(trimmed) ? Number(trimmed) : trimmed;
-                    });
+                    const parsedIds = id.split(',').map(x => Number(x.trim())).filter(x => !isNaN(x));
                     query = query.in('id', parsedIds);
                 } else {
-                    const trimmedId = String(id).trim();
-                    const parsedId = /^\d+$/.test(trimmedId) ? Number(trimmedId) : trimmedId;
-                    query = query.eq('id', parsedId);
+                    const parsedId = Number(String(id).trim());
+                    if (isNaN(parsedId)) {
+                        query = query.eq('id', id); // fallback se for string não numérica
+                    } else {
+                        query = query.eq('id', parsedId);
+                    }
                 }
-            } else if (pedido && !isNaN(pedido) && String(pedido).trim() !== '') {
-                query = query.eq('pedido', Number(pedido));
             } else if (pedido) {
-                query = query.eq('pedido', pedido);
+                if (Array.isArray(pedido)) {
+                    const parsedPedidos = pedido.map(x => cleanPedidoVal(x)).filter(Boolean);
+                    query = query.in('pedido', parsedPedidos);
+                } else if (typeof pedido === 'string' && pedido.includes(',')) {
+                    const parsedPedidos = pedido.split(',').map(x => cleanPedidoVal(x)).filter(Boolean);
+                    query = query.in('pedido', parsedPedidos);
+                } else {
+                    query = query.eq('pedido', cleanPedidoVal(pedido));
+                }
             }
 
-            const { error } = await query;
+            const { data, error } = await query.select('id');
             if (error) throw error;
 
-            return res.status(200).json({ success: true, message: 'Previsão de entrega atualizada com sucesso.' });
+            console.log(`[PUT API] Atualizado com sucesso. Registros afetados:`, data);
+
+            if (!data || data.length === 0) {
+                return res.status(400).json({ 
+                    success: false, 
+                    error: 'Nenhum pedido foi atualizado. Verifique se o pedido existe ou se há restrições de permissão RLS no banco de dados.', 
+                    affected: [] 
+                });
+            }
+
+            return res.status(200).json({ success: true, message: 'Previsão de entrega atualizada com sucesso.', affected: data });
         } catch (err) {
             console.error('Error updating delivery date server-side:', err);
             return res.status(err.message.includes('Acesso negado') ? 403 : 500).json({ error: err.message });

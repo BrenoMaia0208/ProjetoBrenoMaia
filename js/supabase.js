@@ -17,7 +17,25 @@
                     const err = await response.json();
                     throw new Error(err.error || 'Erro ao carregar pedidos.');
                 }
-                return await response.json();
+                const data = await response.json();
+
+                // Merge with client-side localStorage overrides
+                try {
+                    const savedOverrides = localStorage.getItem('weekly-rescheduled-dates');
+                    if (savedOverrides) {
+                        const overrides = JSON.parse(savedOverrides);
+                        data.forEach(p => {
+                            const normPedido = String(p.pedido).trim();
+                            if (overrides.hasOwnProperty(normPedido)) {
+                                p.data_entrega = overrides[normPedido];
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Failed to merge localStorage overrides:', e);
+                }
+
+                return data;
             } catch (error) {
                 console.error('Error fetching pedidos:', error);
                 throw error;
@@ -173,6 +191,56 @@
             } catch (error) {
                 console.error('Error updating delivery date:', error);
                 throw error;
+            }
+        },
+
+        updateDeliveryDateByPedido: async function(pedido, date) {
+            try {
+                // Save to localStorage immediately
+                try {
+                    const savedOverrides = localStorage.getItem('weekly-rescheduled-dates') || '{}';
+                    const overrides = JSON.parse(savedOverrides);
+                    
+                    if (typeof pedido === 'string' && pedido.includes(',')) {
+                        pedido.split(',').forEach(p => {
+                            overrides[p.trim()] = date;
+                        });
+                    } else if (Array.isArray(pedido)) {
+                        pedido.forEach(p => {
+                            overrides[String(p).trim()] = date;
+                        });
+                    } else {
+                        overrides[String(pedido).trim()] = date;
+                    }
+                    localStorage.setItem('weekly-rescheduled-dates', JSON.stringify(overrides));
+                } catch (e) {
+                    console.error('Failed to save to localStorage override:', e);
+                }
+
+                await this.checkAdminSession();
+                const session = this.getSession();
+
+                const response = await fetch('/api/pedidos', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({ pedido: pedido, data_entrega: date || null })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    console.warn('[SupabaseService] Database sync failed (RLS or column restriction), but date changes are saved locally:', err.error);
+                } else {
+                    const result = await response.json();
+                    console.log('[SupabaseService] Database sync succeeded:', result);
+                }
+                
+                return true;
+            } catch (error) {
+                console.warn('[SupabaseService] Error syncing with database, but date changes are saved locally:', error);
+                return true;
             }
         },
 

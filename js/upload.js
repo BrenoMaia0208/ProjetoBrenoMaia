@@ -385,9 +385,16 @@
                          'total_romaneio', 'total_faturado', 'saldo_faturar', 'total_despachado', 'saldo_despacho']
                          .includes(dbCol)) {
                         row[dbCol] = parseNumber(val);
-                    } else if (['data_entrega', 'data_pedido', 'data_liberacao', 'data_entrega_anterior', 
-                              'dt_ult_fornecedor', 'dt_previsao_fornecedor'].includes(dbCol)) {
-                        row[dbCol] = formatDateObj(val);
+                    } else if (dbCol === 'pedido') {
+                        if (val !== null && val !== undefined) {
+                            let pStr = String(val).trim();
+                            if (pStr.endsWith('.0')) {
+                                pStr = pStr.substring(0, pStr.length - 2);
+                            }
+                            row[dbCol] = pStr;
+                        } else {
+                            row[dbCol] = null;
+                        }
                     } else {
                         row[dbCol] = val !== null && val !== undefined ? String(val).trim() : null;
                     }
@@ -491,8 +498,18 @@
                     } else if (['data_entrega', 'data_pedido', 'data_liberacao', 'data_entrega_anterior', 
                               'dt_ult_fornecedor', 'dt_previsao_fornecedor'].includes(dbCol)) {
                         row[dbCol] = parseDate(val);
+                    } else if (dbCol === 'pedido') {
+                        if (val !== null && val !== undefined) {
+                            let pStr = String(val).trim();
+                            if (pStr.endsWith('.0')) {
+                                pStr = pStr.substring(0, pStr.length - 2);
+                            }
+                            row[dbCol] = pStr;
+                        } else {
+                            row[dbCol] = null;
+                        }
                     } else {
-                        row[dbCol] = val;
+                        row[dbCol] = val !== null && val !== undefined ? String(val).trim() : null;
                     }
                 });
                 
@@ -622,6 +639,7 @@
                 // Buscar pedidos atuais para preservar alterações de data do dashboard
                 let existingPedidos = [];
                 try {
+                    // Nós passamos {} explicitamente para evitar pegar filtros ativos da tela do dashboard
                     existingPedidos = await window.SupabaseService.fetchPedidos({});
                 } catch (err) {
                     console.warn('Erro ao carregar pedidos para preservar datas:', err);
@@ -643,10 +661,12 @@
                 existingPedidos.forEach(p => {
                     const normPedido = normalizePedido(p.pedido);
                     if (normPedido) {
-                        // Salva o valor de data_entrega (pode ser data válida ou null/remover)
+                        // Salva no mapa (mesmo que seja null, o que representa data removida)
                         preservedDatesMap[normPedido] = p.data_entrega;
                     }
                 });
+                
+                console.log('[Import] Mapeamento de datas salvas no banco:', JSON.stringify(preservedDatesMap));
                 
                 progressText.textContent = 'Limpando banco de dados...';
                 progressFill.style.width = '15%';
@@ -661,8 +681,11 @@
                 this.validatedRows.forEach(row => {
                     const normPedido = normalizePedido(row.pedido);
                     if (normPedido && preservedDatesMap.hasOwnProperty(normPedido)) {
+                        console.log(`[Import] Mesclando pedido ${normPedido}: Planilha tinha data '${row.data_entrega}', substituindo por data salva no painel '${preservedDatesMap[normPedido]}'`);
                         row.data_entrega = preservedDatesMap[normPedido];
                         matchedCount++;
+                    } else if (normPedido) {
+                        console.log(`[Import] Pedido ${normPedido} não encontrado nas datas salvas. Mantendo data original da planilha: '${row.data_entrega}'`);
                     }
                 });
                 console.log(`[Import] Mesclagem concluída: ${matchedCount} datas de entrega preservadas das ${this.validatedRows.length} linhas importadas.`);

@@ -22,6 +22,7 @@
             const modal = document.getElementById('weekly-plan-modal');
             const openBtn = document.getElementById('weekly-plan-btn');
             const closeBtn = document.getElementById('weekly-plan-close-btn');
+            const resetBtn = document.getElementById('weekly-plan-reset-btn');
 
             if (openBtn && modal) {
                 openBtn.addEventListener('click', () => {
@@ -33,6 +34,21 @@
             if (closeBtn && modal) {
                 closeBtn.addEventListener('click', () => {
                     modal.classList.add('hidden');
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', async () => {
+                    if (confirm('Tem certeza de que deseja resetar todas as datas de reagendamento para os valores originais da planilha?')) {
+                        localStorage.removeItem('weekly-rescheduled-dates');
+                        if (window.app && window.app.showNotification) {
+                            window.app.showNotification('Todas as datas de reagendamento foram resetadas para o original.', 'success');
+                        }
+                        if (window.app && window.app.loadData) {
+                            await window.app.loadData();
+                            this.renderPlan();
+                        }
+                    }
                 });
             }
 
@@ -386,7 +402,8 @@
                                 btn.disabled = true;
                                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                                 
-                                await window.SupabaseService.updateDeliveryDate(dbId, finalDate);
+                                // Atualizar por 'pedido' em vez de 'id', pois a chave do pedido é única comercialmente e está mapeada no dropdown
+                                await window.SupabaseService.updateDeliveryDateByPedido(pedidoId, finalDate);
                                 
                                 if (window.app && window.app.showNotification) {
                                     if (finalDate) {
