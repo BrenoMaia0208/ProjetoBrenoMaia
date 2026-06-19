@@ -227,7 +227,6 @@
                                     <div class="dropdown-main-menu" style="display: flex; flex-direction: column; gap: 4px;">
                                         <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; padding: 4px 8px; border-bottom: 1px solid rgba(15, 23, 42, 0.05); margin-bottom: 4px; text-align: left;">Gerenciar Entrega</div>
                                         <button class="dropdown-item btn-postpone" data-id="${idsString}" data-pedido="${pedidosString}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #0f172a; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-days" style="color: var(--accent-primary);"></i> Reagendar</button>
-                                        <button class="dropdown-item btn-remove" data-id="${idsString}" data-pedido="${pedidosString}" style="background: transparent; border: none; text-align: left; padding: 6px 8px; font-size: 0.8rem; color: #ef4444; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; width: 100%;"><i class="fa-solid fa-calendar-minus"></i> Remover da Semana</button>
                                     </div>
                                     <div class="dropdown-reschedule-section hidden" style="display: flex; flex-direction: column; gap: 6px; padding: 4px;">
                                         <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-align: left;">Nova Data:</div>
@@ -381,21 +380,20 @@
                             if (!dateInput) return;
 
                             const newDate = dateInput.value;
-                            if (!newDate) {
-                                if (window.app && window.app.showNotification) {
-                                    window.app.showNotification('Selecione uma data válida.', 'error');
-                                }
-                                return;
-                            }
+                            const finalDate = newDate ? newDate : null;
 
                             try {
                                 btn.disabled = true;
                                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                                 
-                                await window.SupabaseService.updateDeliveryDate(dbId, newDate);
+                                await window.SupabaseService.updateDeliveryDate(dbId, finalDate);
                                 
                                 if (window.app && window.app.showNotification) {
-                                    window.app.showNotification(`Pedido ${pedidoId} reagendado com sucesso para ${newDate.split('-').reverse().join('/')}!`, 'success');
+                                    if (finalDate) {
+                                        window.app.showNotification(`Pedido ${pedidoId} reagendado com sucesso para ${newDate.split('-').reverse().join('/')}!`, 'success');
+                                    } else {
+                                        window.app.showNotification(`Pedido ${pedidoId} removido do planejamento semanal!`, 'success');
+                                    }
                                 }
                                 
                                 if (dropdown) dropdown.classList.add('hidden');
@@ -416,91 +414,7 @@
                         });
                     });
 
-                    // Remove from Planning (Delete) handler
-                    card.querySelectorAll('.btn-remove').forEach(btn => {
-                        btn.addEventListener('click', async (e) => {
-                            e.stopPropagation();
-                            const dbId = btn.getAttribute('data-id');
-                            const pedidoId = btn.getAttribute('data-pedido');
-                            const dropdown = btn.closest('.weekly-action-dropdown');
-                            
-                            if (!confirm(`Deseja realmente remover o pedido ${pedidoId} do cronograma desta semana?`)) {
-                                return;
-                            }
-                            
-                            try {
-                                btn.disabled = true;
-                                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                                
-                                await window.SupabaseService.deletePedido(dbId);
-                                
-                                if (window.app && window.app.showNotification) {
-                                    window.app.showNotification(`Pedido ${pedidoId} removido do planejamento!`, 'success');
-                                }
 
-                                if (dropdown) dropdown.classList.add('hidden');
-
-                                // HIDE THE ITEM IMMEDIATELY IN THE DOM (OPTIMISTIC UI UPDATE)
-                                const deliveryItem = btn.closest('.weekly-delivery-item');
-                                if (deliveryItem) {
-                                    deliveryItem.style.transition = 'all 0.3s ease';
-                                    deliveryItem.style.opacity = '0';
-                                    deliveryItem.style.transform = 'scale(0.8)';
-                                    setTimeout(() => {
-                                        deliveryItem.remove();
-                                        // Recalculate day total
-                                        const cardBody = btn.closest('.weekly-day-card');
-                                        if (cardBody) {
-                                            const remainingItems = cardBody.querySelectorAll('.weekly-delivery-item');
-                                            let dayTotal = 0;
-                                            remainingItems.forEach(item => {
-                                                const valueSpan = item.querySelector('.delivery-value');
-                                                if (valueSpan) {
-                                                    const valueText = valueSpan.textContent.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
-                                                    dayTotal += parseFloat(valueText) || 0;
-                                                }
-                                            });
-                                            const totalEl = cardBody.querySelector('.day-total');
-                                            if (totalEl) {
-                                                totalEl.textContent = dayTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                                            }
-                                            
-                                            // Recalculate all day totals to update the week's total
-                                            let newWeekTotal = 0;
-                                            document.querySelectorAll('.weekly-day-card').forEach(dayCard => {
-                                                dayCard.querySelectorAll('.delivery-value').forEach(valSpan => {
-                                                    const valueText = valSpan.textContent.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
-                                                    newWeekTotal += parseFloat(valueText) || 0;
-                                                });
-                                            });
-                                            const weekTotalEl = document.getElementById('weekly-plan-total-value');
-                                            if (weekTotalEl) {
-                                                weekTotalEl.textContent = newWeekTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                                            }
-                                            
-                                            if (remainingItems.length === 0) {
-                                                const listContainer = cardBody.querySelector('.weekly-deliveries-list');
-                                                if (listContainer) {
-                                                    listContainer.innerHTML = `<div style="text-align: center; padding: 2rem 0; color: #64748b; font-size: 0.85rem; font-style: italic;">Nenhuma entrega</div>`;
-                                                }
-                                            }
-                                        }
-                                    }, 300);
-                                }
-                                
-                                if (window.app && window.app.loadData) {
-                                    await window.app.loadData();
-                                }
-                            } catch (err) {
-                                console.error(err);
-                                if (window.app && window.app.showNotification) {
-                                    window.app.showNotification(err.message || 'Erro ao remover pedido.', 'error');
-                                }
-                                btn.innerHTML = 'Remover da Semana';
-                                btn.disabled = false;
-                            }
-                        });
-                    });
                 }
 
                 grid.appendChild(card);
