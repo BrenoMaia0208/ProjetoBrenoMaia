@@ -32,7 +32,6 @@
                         <td><span class="skeleton" style="width: 50px; height: 18px;"></span></td>
                         <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
                         <td><span class="skeleton" style="width: 90px; height: 18px;"></span></td>
-                        <td><span class="skeleton" style="width: 80px; height: 18px;"></span></td>
                     </tr>
                 `;
             }
@@ -178,7 +177,7 @@
             tbody.innerHTML = '';
 
             if (pageData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 2rem;">Nenhum resultado encontrado.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 2rem;">Nenhum resultado encontrado.</td></tr>';
             } else {
                 pageData.forEach(row => {
                     const tr = document.createElement('tr');
@@ -254,13 +253,12 @@
                         <td>${formatPercent(row.perc_falteiro)}</td>
                         <td>${formatCurrency(row.total_disponivel)}</td>
                         <td><span class="status-badge ${getStatusClass(displayStatusVenda)}">${displayStatusVenda}</span></td>
-                        <td><span class="status-badge ${getStatusClass(row.status_compra)}">${row.status_compra || '-'}</span></td>
                     `;
                     
                     const detailsTr = document.createElement('tr');
                     detailsTr.className = 'details-row hidden';
                     detailsTr.innerHTML = `
-                        <td colspan="11">
+                        <td colspan="10">
                             <div class="row-details-wrapper">
                                 <div class="details-grid">
                                     <div class="detail-item">
@@ -298,6 +296,10 @@
                                      <div class="detail-item">
                                          <strong>Vendedor:</strong>
                                          <span>${row.vendedor || '-'}</span>
+                                     </div>
+                                     <div class="detail-item">
+                                         <strong>Status Compra:</strong>
+                                         <span class="status-badge ${getStatusClass(row.status_compra)}">${row.status_compra || '-'}</span>
                                      </div>
                                 </div>
                             </div>
