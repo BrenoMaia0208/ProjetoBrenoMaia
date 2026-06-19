@@ -40,7 +40,13 @@
         },
 
         render: function(data) {
-            this.allData = (data || []).map(row => {
+            // Filter out orders with status 'ENTREGUE' from the main table list view
+            const activeData = (data || []).filter(row => {
+                const statusUpper = String(row.status_venda || '').toUpperCase();
+                return statusUpper !== 'ENTREGUE';
+            });
+
+            this.allData = activeData.map(row => {
                 const totalPedido = row.total_pedido || 0;
                 const totalRomaneio = row.total_romaneio || 0;
                 const remainingBalance = Math.max(0, totalPedido - (row.total_despachado || 0));
