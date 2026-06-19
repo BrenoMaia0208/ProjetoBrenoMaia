@@ -52,6 +52,89 @@
                 });
             }
 
+            const exportImgBtn = document.getElementById('weekly-plan-export-img-btn');
+            if (exportImgBtn) {
+                exportImgBtn.addEventListener('click', async () => {
+                    const grid = document.getElementById('weekly-plan-grid');
+                    if (!grid) return;
+
+                    try {
+                        exportImgBtn.disabled = true;
+                        exportImgBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Exportando...';
+
+                        // 1. Temporarily expand all day card scrollable lists so all items are visible
+                        const lists = grid.querySelectorAll('.weekly-deliveries-list');
+                        const originalStyles = [];
+                        lists.forEach(list => {
+                            originalStyles.push({
+                                element: list,
+                                maxHeight: list.style.maxHeight,
+                                overflowY: list.style.overflowY,
+                                overflow: list.style.overflow
+                            });
+                            list.style.maxHeight = 'none';
+                            list.style.overflowY = 'visible';
+                            list.style.overflow = 'visible';
+                        });
+
+                        const dayCards = grid.querySelectorAll('.weekly-day-card');
+                        const cardStyles = [];
+                        dayCards.forEach(card => {
+                            cardStyles.push({
+                                element: card,
+                                height: card.style.height,
+                                maxHeight: card.style.maxHeight,
+                                overflow: card.style.overflow
+                            });
+                            card.style.height = 'auto';
+                            card.style.maxHeight = 'none';
+                            card.style.overflow = 'visible';
+                        });
+
+                        // 2. Run html2canvas on the grid
+                        const canvas = await html2canvas(grid, {
+                            backgroundColor: '#f1f5f9', // soft background matching the app
+                            scale: 2, // high quality
+                            useCORS: true,
+                            logging: false
+                        });
+
+                        // 3. Restore original styles
+                        originalStyles.forEach(s => {
+                            s.element.style.maxHeight = s.maxHeight;
+                            s.element.style.overflowY = s.overflowY;
+                            s.element.style.overflow = s.overflow;
+                        });
+                        cardStyles.forEach(s => {
+                            s.element.style.height = s.height;
+                            s.element.style.maxHeight = s.maxHeight;
+                            s.element.style.overflow = s.overflow;
+                        });
+
+                        // 4. Trigger download
+                        const image = canvas.toDataURL('image/png');
+                        const link = document.createElement('a');
+                        const datesBadge = document.getElementById('weekly-plan-dates');
+                        const weekStr = datesBadge ? datesBadge.textContent.replace(/\s+/g, '_').replace(/\//g, '-') : 'semana';
+                        link.download = `Planejamento_Semanal_${weekStr}.png`;
+                        link.href = image;
+                        link.click();
+
+                        if (window.app && window.app.showNotification) {
+                            window.app.showNotification('Imagem exportada com sucesso!', 'success');
+                        }
+                    } catch (err) {
+                        console.error('Error exporting image:', err);
+                        if (window.app && window.app.showNotification) {
+                            window.app.showNotification('Erro ao exportar imagem.', 'error');
+                        }
+                    } finally {
+                        exportImgBtn.disabled = false;
+                        exportImgBtn.innerHTML = '<i class="fa-solid fa-image"></i> Exportar Imagem';
+                    }
+                });
+            }
+
             if (modal) {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
