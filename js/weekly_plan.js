@@ -62,56 +62,52 @@
                         exportImgBtn.disabled = true;
                         exportImgBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Copiando...';
 
-                        // 1. Temporarily expand all day card scrollable lists so all items are visible
-                        const lists = grid.querySelectorAll('.weekly-deliveries-list');
-                        const originalStyles = [];
-                        lists.forEach(list => {
-                            originalStyles.push({
-                                element: list,
-                                maxHeight: list.style.maxHeight,
-                                overflowY: list.style.overflowY,
-                                overflow: list.style.overflow
-                            });
-                            list.style.maxHeight = 'none';
-                            list.style.overflowY = 'visible';
-                            list.style.overflow = 'visible';
-                        });
-
-                        const dayCards = grid.querySelectorAll('.weekly-day-card');
-                        const cardStyles = [];
-                        dayCards.forEach(card => {
-                            cardStyles.push({
-                                element: card,
-                                height: card.style.height,
-                                maxHeight: card.style.maxHeight,
-                                overflow: card.style.overflow
-                            });
-                            card.style.height = 'auto';
-                            card.style.maxHeight = 'none';
-                            card.style.overflow = 'visible';
-                        });
-
-                        // 2. Run html2canvas on the grid
+                        // Run html2canvas with onclone to perform clean layout alterations and animation bypass on the clone
                         const canvas = await html2canvas(grid, {
                             backgroundColor: '#f1f5f9', // soft background matching the app
                             scale: 2, // high quality
                             useCORS: true,
-                            logging: false
+                            logging: false,
+                            onclone: (clonedDoc) => {
+                                const clonedGrid = clonedDoc.getElementById('weekly-plan-grid');
+                                if (clonedGrid) {
+                                    // 1. Force clean flexbox layout for side-by-side columns
+                                    clonedGrid.style.display = 'flex';
+                                    clonedGrid.style.flexDirection = 'row';
+                                    clonedGrid.style.flexWrap = 'nowrap';
+                                    clonedGrid.style.width = '1650px'; // Standard desktop layout width
+                                    clonedGrid.style.gap = '18px';
+                                    clonedGrid.style.padding = '10px';
+
+                                    // 2. Expand scrollable lists and card containers
+                                    clonedGrid.querySelectorAll('.weekly-deliveries-list').forEach(list => {
+                                        list.style.maxHeight = 'none';
+                                        list.style.overflow = 'visible';
+                                        list.style.overflowY = 'visible';
+                                    });
+
+                                    clonedGrid.querySelectorAll('.weekly-day-card').forEach(card => {
+                                        card.style.height = 'auto';
+                                        card.style.maxHeight = 'none';
+                                        card.style.overflow = 'visible';
+                                        card.style.minHeight = '420px';
+                                        card.style.flex = '1';
+                                    });
+
+                                    // 3. Disable animations, transitions, and restore full opacity/transforms
+                                    // This fixes the issue where fade-in animations on day cards render as blank/opacity 0
+                                    const allClonedElements = clonedGrid.querySelectorAll('*');
+                                    allClonedElements.forEach(el => {
+                                        el.style.animation = 'none';
+                                        el.style.transition = 'none';
+                                        el.style.transform = 'none';
+                                        el.style.opacity = '1';
+                                    });
+                                }
+                            }
                         });
 
-                        // 3. Restore original styles
-                        originalStyles.forEach(s => {
-                            s.element.style.maxHeight = s.maxHeight;
-                            s.element.style.overflowY = s.overflowY;
-                            s.element.style.overflow = s.overflow;
-                        });
-                        cardStyles.forEach(s => {
-                            s.element.style.height = s.height;
-                            s.element.style.maxHeight = s.maxHeight;
-                            s.element.style.overflow = s.overflow;
-                        });
-
-                        // 4. Copy to Clipboard
+                        // 5. Copy to Clipboard
                         canvas.toBlob(async (blob) => {
                             try {
                                 await navigator.clipboard.write([
