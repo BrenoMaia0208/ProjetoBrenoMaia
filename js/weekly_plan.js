@@ -68,18 +68,18 @@
                             scale: 2.5, // Even higher resolution and crispness
                             useCORS: true,
                             logging: false,
-                            windowWidth: 1800, // Force simulated desktop window width to prevent vertical collapse on small screens
+                            windowWidth: 1200, // Force simulated desktop window width to prevent vertical collapse on small screens
                             onclone: (clonedDoc) => {
                                 const clonedGrid = clonedDoc.getElementById('weekly-plan-grid');
                                 if (clonedGrid) {
-                                    // 1. Force structural horizontal layout using inline-block + white-space nowrap (bypasses html2canvas flexbox/grid bugs)
+                                    // 1. Force structural 3+2 layout (Row 1: Mon/Tue/Wed, Row 2: Thu/Fri) to fit chat viewports
                                     clonedGrid.style.display = 'block';
-                                    clonedGrid.style.width = '1750px';
-                                    clonedGrid.style.minWidth = '1750px'; // guarantee minimum width of desktop layout
-                                    clonedGrid.style.padding = '24px';
+                                    clonedGrid.style.width = '1080px'; // Narrower container to force wrapping
+                                    clonedGrid.style.minWidth = '1080px';
+                                    clonedGrid.style.padding = '28px';
                                     clonedGrid.style.backgroundColor = '#f8fafc';
                                     clonedGrid.style.boxSizing = 'border-box';
-                                    clonedGrid.style.whiteSpace = 'nowrap';
+                                    clonedGrid.style.whiteSpace = 'normal'; // Allow wrapping
 
                                     // Expand scrollable lists and card containers inline
                                     clonedGrid.querySelectorAll('.weekly-deliveries-list').forEach(list => {
@@ -89,16 +89,22 @@
                                         list.style.display = 'block';
                                     });
 
-                                    clonedGrid.querySelectorAll('.weekly-day-card').forEach((card, idx, arr) => {
+                                    clonedGrid.querySelectorAll('.weekly-day-card').forEach((card, idx) => {
                                         card.style.display = 'inline-block';
                                         card.style.width = '320px';
-                                        card.style.marginRight = idx === arr.length - 1 ? '0px' : '18px';
+                                        // Remove right margin on the 3rd (Wed) and 5th (Fri) columns to prevent wrapping errors
+                                        if (idx === 2 || idx === 4) {
+                                            card.style.marginRight = '0px';
+                                        } else {
+                                            card.style.marginRight = '20px';
+                                        }
+                                        card.style.marginBottom = '20px'; // space between row 1 and row 2
                                         card.style.verticalAlign = 'top';
-                                        card.style.whiteSpace = 'normal'; // restore normal text wrapping inside card
+                                        card.style.whiteSpace = 'normal';
                                         card.style.height = 'auto';
                                         card.style.maxHeight = 'none';
                                         card.style.overflow = 'visible';
-                                        card.style.minHeight = '480px';
+                                        card.style.minHeight = '500px';
                                         card.style.boxSizing = 'border-box';
                                     });
 
@@ -120,16 +126,17 @@
                                     style.innerHTML = `
                                         #weekly-plan-grid {
                                             display: block !important;
-                                            width: 1750px !important;
+                                            width: 1080px !important;
                                             padding: 28px !important;
                                             background-color: #f8fafc !important;
                                             box-sizing: border-box !important;
-                                            white-space: nowrap !important;
+                                            white-space: normal !important;
                                         }
                                         .weekly-day-card {
                                             display: inline-block !important;
                                             width: 320px !important;
-                                            margin-right: 18px !important;
+                                            margin-right: 20px !important;
+                                            margin-bottom: 20px !important;
                                             vertical-align: top !important;
                                             white-space: normal !important;
                                             background: #ffffff !important;
@@ -142,7 +149,8 @@
                                             box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05) !important;
                                             box-sizing: border-box !important;
                                         }
-                                        .weekly-day-card:last-child {
+                                        .weekly-day-card:nth-child(3),
+                                        .weekly-day-card:nth-child(5) {
                                             margin-right: 0 !important;
                                         }
                                         .weekly-day-header {
