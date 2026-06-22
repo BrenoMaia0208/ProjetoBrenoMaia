@@ -205,8 +205,8 @@
                     const isAdmin = window.SupabaseService.isAdmin();
                     const deliveryDateHtml = isAdmin 
                         ? `<div class="delivery-date-edit-container">
-                               <input type="date" class="edit-delivery-date" value="${row.data_entrega || ''}" data-id="${row.id}">
-                               <button class="btn-save-date btn-icon" data-id="${row.id}" style="display: none;" title="Salvar Previsão">
+                               <input type="date" class="edit-delivery-date" value="${row.data_entrega || ''}" data-id="${row.id}" data-pedido="${row.pedido || ''}">
+                               <button class="btn-save-date btn-icon" data-id="${row.id}" data-pedido="${row.pedido || ''}" style="display: none;" title="Salvar Previsão">
                                    <i class="fa-solid fa-floppy-disk"></i>
                                </button>
                            </div>`
@@ -341,39 +341,40 @@
                             // Evitar cliques e fechar a linha
                             dateInput.addEventListener('click', (e) => e.stopPropagation());
                             saveBtn.addEventListener('click', async (e) => {
-                                e.stopPropagation();
-                                const newDate = dateInput.value;
-                                const pedidoId = saveBtn.getAttribute('data-id');
-                                try {
-                                    saveBtn.disabled = true;
-                                    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                                    
-                                    await window.SupabaseService.updateDeliveryDate(pedidoId, newDate);
-                                    
-                                    // Atualiza localmente
-                                    row.data_entrega = newDate;
-                                    
-                                    if (window.app && window.app.showNotification) {
-                                        window.app.showNotification('Previsão de entrega atualizada com sucesso!', 'success');
-                                    }
-                                    
-                                    saveBtn.style.display = 'none';
-                                    saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
-                                    saveBtn.disabled = false;
-                                    
-                                    // Recarrega os dados para atualizar os outros elementos do painel
-                                    if (window.app && window.app.loadData) {
-                                        await window.app.loadData();
-                                    }
-                                } catch (err) {
-                                    console.error(err);
-                                    if (window.app && window.app.showNotification) {
-                                        window.app.showNotification(err.message || 'Erro ao atualizar data de entrega.', 'error');
-                                    }
-                                    saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
-                                    saveBtn.disabled = false;
-                                }
-                            });
+                                 e.stopPropagation();
+                                 const newDate = dateInput.value;
+                                 const pedidoId = saveBtn.getAttribute('data-id');
+                                 const pedidoNum = saveBtn.getAttribute('data-pedido');
+                                 try {
+                                     saveBtn.disabled = true;
+                                     saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                                     
+                                     await window.SupabaseService.updateDeliveryDate(pedidoId, newDate, pedidoNum);
+                                     
+                                     // Atualiza localmente
+                                     row.data_entrega = newDate;
+                                     
+                                     if (window.app && window.app.showNotification) {
+                                         window.app.showNotification('Previsão de entrega atualizada com sucesso!', 'success');
+                                     }
+                                     
+                                     saveBtn.style.display = 'none';
+                                     saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
+                                     saveBtn.disabled = false;
+                                     
+                                     // Recarrega os dados para atualizar os outros elementos do painel
+                                     if (window.app && window.app.loadData) {
+                                         await window.app.loadData();
+                                     }
+                                 } catch (err) {
+                                     console.error(err);
+                                     if (window.app && window.app.showNotification) {
+                                         window.app.showNotification(err.message || 'Erro ao atualizar data de entrega.', 'error');
+                                     }
+                                     saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
+                                     saveBtn.disabled = false;
+                                 }
+                             });
                         }
                     }
                 });

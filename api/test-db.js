@@ -18,7 +18,11 @@ module.exports = async (req, res) => {
 
         if (error) throw error;
 
-        return res.status(200).json({ count: rows.length, rows });
+        return res.status(200).json({ 
+            count: rows.length, 
+            serviceRoleKeyDefined: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+            rows 
+        });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
