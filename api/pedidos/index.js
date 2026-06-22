@@ -288,12 +288,12 @@ module.exports = async (req, res) => {
             let query = supabase.from('pedidos').update({ data_entrega: data_entrega || null });
             
             const cleanPedidoVal = (val) => {
-                if (val === null || val === undefined) return '';
+                if (val === null || val === undefined) return null;
                 let str = String(val).trim();
                 if (str.endsWith('.0')) {
                     str = str.substring(0, str.length - 2);
                 }
-                return str;
+                return /^\d+$/.test(str) ? Number(str) : str;
             };
 
             if (id) {
@@ -308,13 +308,16 @@ module.exports = async (req, res) => {
                 }
             } else if (pedido) {
                 if (Array.isArray(pedido)) {
-                    const parsedPedidos = pedido.map(x => cleanPedidoVal(x)).filter(Boolean);
+                    const parsedPedidos = pedido.map(x => cleanPedidoVal(x)).filter(x => x !== null);
                     query = query.in('pedido', parsedPedidos);
                 } else if (typeof pedido === 'string' && pedido.includes(',')) {
-                    const parsedPedidos = pedido.split(',').map(x => cleanPedidoVal(x)).filter(Boolean);
+                    const parsedPedidos = pedido.split(',').map(x => cleanPedidoVal(x)).filter(x => x !== null);
                     query = query.in('pedido', parsedPedidos);
                 } else {
-                    query = query.eq('pedido', cleanPedidoVal(pedido));
+                    const cleaned = cleanPedidoVal(pedido);
+                    if (cleaned !== null) {
+                        query = query.eq('pedido', cleaned);
+                    }
                 }
             }
 
