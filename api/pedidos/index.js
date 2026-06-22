@@ -179,15 +179,10 @@ module.exports = async (req, res) => {
                 
                 if (id) {
                     if (typeof id === 'string' && id.includes(',')) {
-                        const parsedIds = id.split(',').map(x => {
-                            const trimmed = x.trim();
-                            return /^\d+$/.test(trimmed) ? Number(trimmed) : trimmed;
-                        });
+                        const parsedIds = id.split(',').map(x => x.trim());
                         query = query.in('id', parsedIds);
                     } else {
-                        const trimmedId = String(id).trim();
-                        const parsedId = /^\d+$/.test(trimmedId) ? Number(trimmedId) : trimmedId;
-                        query = query.eq('id', parsedId);
+                        query = query.eq('id', id);
                     }
                 } else if (pedido && !isNaN(pedido) && pedido.trim() !== '') {
                     query = query.eq('pedido', Number(pedido));
@@ -304,18 +299,12 @@ module.exports = async (req, res) => {
             if (id) {
                 // Se for um array de IDs ou uma string de IDs separados por vírgula (agrupamento do planejamento semanal)
                 if (Array.isArray(id)) {
-                    const parsedIds = id.map(x => Number(String(x).trim())).filter(x => !isNaN(x));
-                    query = query.in('id', parsedIds);
+                    query = query.in('id', id);
                 } else if (typeof id === 'string' && id.includes(',')) {
-                    const parsedIds = id.split(',').map(x => Number(x.trim())).filter(x => !isNaN(x));
+                    const parsedIds = id.split(',').map(x => x.trim());
                     query = query.in('id', parsedIds);
                 } else {
-                    const parsedId = Number(String(id).trim());
-                    if (isNaN(parsedId)) {
-                        query = query.eq('id', id); // fallback se for string não numérica
-                    } else {
-                        query = query.eq('id', parsedId);
-                    }
+                    query = query.eq('id', id);
                 }
             } else if (pedido) {
                 if (Array.isArray(pedido)) {
