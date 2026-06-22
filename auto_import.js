@@ -33,8 +33,8 @@ const CONFIG = {
     ADMIN_PASSWORD: 'SUA_SENHA_AQUI', // COLOQUE A SENHA DA SUA CONTA DE ADMIN AQUI
 
     // Caminho da planilha gerada pelo ERP
-    // Pode ser um caminho absoluto (ex: 'C:\\ERP_Exports\\pedidos.xlsx')
-    EXCEL_FILE_PATH: path.join(__dirname, '05.FOLLOW-UP PEDIDOS DE VENDA - 03.06 (1).xlsx'),
+    // Configurado com o seu arquivo do Google Drive
+    EXCEL_FILE_PATH: 'H:\\Meu Drive\\01.LOGISTICA\\10. SCANNER - EXPEDIÇÃO\\01.PLANILHA DE PREENCHIMENTO - PEDIDO DE VENDAS.xlsx',
 
     // Nome exato da aba que o ERP gera na planilha (se houver)
     TARGET_SHEET_NAME: 'MAPA DE PEDIDOS'
