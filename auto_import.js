@@ -37,7 +37,7 @@ const CONFIG = {
     EXCEL_FILE_PATH: 'H:\\Meu Drive\\01.LOGISTICA\\10. SCANNER - EXPEDIÇÃO\\01.PLANILHA DE PREENCHIMENTO - PEDIDO DE VENDAS.xlsx',
 
     // Nome exato da aba que o ERP gera na planilha (se houver)
-    TARGET_SHEET_NAME: 'TABELA'
+    TARGET_SHEET_NAME: 'MAPA DE PEDIDOS'
 };
 
 // Mapeamento de colunas (idêntico ao do Dashboard)
@@ -252,19 +252,6 @@ async function executeImport() {
                 }
             });
             
-            // Calculate Excel formula columns programmatically (simulating Excel formulas from MAPA DE PEDIDOS)
-            const tr = row.total_romaneio || 0;
-            const sd = row.saldo_despacho || 0;
-            const tp = row.total_pedido || 0;
-            const sp = row.saldo_pedido || 0;
-            const td = row.total_despachado || 0;
-
-            row.total_disponivel = tr + sd;
-            row.perc_disponivel = tp > 0 ? (row.total_disponivel / tp) : 0;
-            row.perc_falteiro = tp > 0 ? (sp / tp) : 0;
-            row.perc_despacho = tp > 0 ? (td / tp) : 0;
-            row.contato = null;
-
             if (row.perc_disponivel !== undefined && row.perc_disponivel < 0) row.perc_disponivel = 0;
             if (row.total_disponivel !== undefined && row.total_disponivel < 0) row.total_disponivel = 0;
 
