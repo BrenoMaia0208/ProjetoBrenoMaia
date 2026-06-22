@@ -259,6 +259,61 @@
             }
         },
 
+        syncLocalOverridesToDatabase: async function() {
+            try {
+                const savedOverrides = localStorage.getItem('weekly-rescheduled-dates');
+                if (!savedOverrides) return;
+
+                const overrides = JSON.parse(savedOverrides);
+                const keys = Object.keys(overrides);
+                if (keys.length === 0) return;
+
+                console.log('[SupabaseService] Sincronizando alterações locais com o banco de dados...', keys.length);
+                
+                let session = null;
+                try {
+                    await this.checkAdminSession();
+                    session = this.getSession();
+                } catch (e) {
+                    // Não é admin ou não está autenticado, pula a sincronização automática
+                    return;
+                }
+                if (!session) return;
+
+                let syncedCount = 0;
+                for (const pedido of keys) {
+                    const date = overrides[pedido];
+                    try {
+                        const response = await fetch('/api/pedidos', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session.access_token}`
+                            },
+                            body: JSON.stringify({ pedido: pedido, data_entrega: date || null })
+                        });
+
+                        if (response.ok) {
+                            delete overrides[pedido];
+                            syncedCount++;
+                        }
+                    } catch (err) {
+                        console.error(`[SupabaseService] Erro ao sincronizar pedido ${pedido}:`, err);
+                    }
+                }
+
+                if (syncedCount > 0) {
+                    localStorage.setItem('weekly-rescheduled-dates', JSON.stringify(overrides));
+                    console.log(`[SupabaseService] Sincronizados com sucesso: ${syncedCount} pedidos.`);
+                    if (window.app && window.app.showNotification) {
+                        window.app.showNotification(`${syncedCount} alteração(ões) de data sincronizada(s) com o banco de dados!`, 'success');
+                    }
+                }
+            } catch (error) {
+                console.warn('[SupabaseService] Erro geral ao sincronizar dados locais:', error);
+            }
+        },
+ 
         deletePedido: async function(id) {
             try {
                 await this.checkAdminSession();

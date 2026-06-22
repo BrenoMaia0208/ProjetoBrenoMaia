@@ -25,6 +25,11 @@
                 window.TableService.renderSkeletons();
             }
 
+            // Sincroniza qualquer alteração local prévia com o banco de dados agora que a permissão RLS está ativa
+            if (window.SupabaseService && typeof window.SupabaseService.syncLocalOverridesToDatabase === 'function') {
+                await window.SupabaseService.syncLocalOverridesToDatabase();
+            }
+
             const filters = window.FiltersService ? window.FiltersService.getActiveFilters() : {};
             const data = await window.SupabaseService.fetchPedidos(filters);
             if (window.DashboardService) window.DashboardService.update(data);
