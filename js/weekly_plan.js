@@ -358,7 +358,7 @@
 
                         weekdays.forEach(day => {
                             const dayPedidos = grouped[day.key] || [];
-                            const dayTotal = dayPedidos.reduce((sum, p) => sum + (p.total_pedido || 0), 0);
+                            const dayTotal = dayPedidos.reduce((sum, p) => sum + (p.total_disponivel || 0), 0);
                             const dayTotalFormatted = dayTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
                             text += `*${day.name}* (Total: ${dayTotalFormatted})\n`;
@@ -378,11 +378,11 @@
                                             cidade: cidade,
                                             programa: programa,
                                             grupo: grupo,
-                                            total_pedido: 0,
+                                            total_disponivel: 0,
                                             pedidos: []
                                         };
                                     }
-                                    subGrouped[groupKey].total_pedido += (p.total_pedido || 0);
+                                    subGrouped[groupKey].total_disponivel += (p.total_disponivel || 0);
                                     subGrouped[groupKey].pedidos.push(p.pedido);
                                 });
 
@@ -390,7 +390,7 @@
                                     const isChecked = g.pedidos.every(ped => !!this.checkedState[ped]);
                                     const statusIcon = isChecked ? '✅' : '⏳';
                                     const statusText = isChecked ? 'Realizada' : 'Pendente';
-                                    const valFormatted = g.total_pedido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                                    const valFormatted = g.total_disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                                     text += `${statusIcon} *${g.cidade}* | Prog: ${g.programa} | Grupo: ${g.grupo} | ${valFormatted} (${statusText})\n`;
                                 });
                             }
@@ -515,7 +515,7 @@
             grid.innerHTML = '';
 
             // Calculate total for the entire week
-            const weekTotal = this.weeklyPedidos.reduce((sum, p) => sum + (p.total_pedido || 0), 0);
+            const weekTotal = this.weeklyPedidos.reduce((sum, p) => sum + (p.total_disponivel || 0), 0);
             const weekTotalEl = document.getElementById('weekly-plan-total-value');
             if (weekTotalEl) {
                 weekTotalEl.textContent = weekTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -552,7 +552,7 @@
 
             weekdays.forEach(day => {
                 const dayPedidos = grouped[day.key] || [];
-                const dayTotal = dayPedidos.reduce((sum, p) => sum + (p.total_pedido || 0), 0);
+                const dayTotal = dayPedidos.reduce((sum, p) => sum + (p.total_disponivel || 0), 0);
 
                 const card = document.createElement('div');
                 card.className = 'weekly-day-card';
@@ -567,17 +567,17 @@
                         subGrouped[cidade] = {
                             cidade: cidade,
                             data_entrega: p.data_entrega,
-                            total_pedido: 0,
+                            total_disponivel: 0,
                             items: []
                         };
                     }
-                    subGrouped[cidade].total_pedido += (p.total_pedido || 0);
+                    subGrouped[cidade].total_disponivel += (p.total_disponivel || 0);
                     subGrouped[cidade].items.push({
                         id: p.id,
                         pedido: p.pedido,
                         programa: (p.programa || '-').trim(),
                         grupo: (p.grupo || '-').trim(),
-                        total_pedido: p.total_pedido || 0
+                        total_disponivel: p.total_disponivel || 0
                     });
                 });
 
@@ -624,7 +624,7 @@
                             <div class="delivery-sub-item" style="${idx > 0 ? 'margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(15, 23, 42, 0.06);' : ''}">
                                 <div class="detail-line"><span style="color: #64748b;">Programa:</span> <strong style="color: var(--text-primary);">${item.programa}</strong></div>
                                 <div class="detail-line"><span style="color: #64748b;">Grupo:</span> <strong style="color: var(--text-primary);">${item.grupo}</strong></div>
-                                <div class="detail-line" style="margin-top: 2px;"><span style="color: #64748b;">Valor:</span> <strong style="color: var(--text-primary);">${formatCurrency(item.total_pedido)}</strong></div>
+                                <div class="detail-line" style="margin-top: 2px;"><span style="color: #64748b;">Valor:</span> <strong style="color: var(--text-primary);">${formatCurrency(item.total_disponivel)}</strong></div>
                             </div>
                         `).join('');
 
@@ -640,7 +640,7 @@
                                     ${detailsHtml}
                                 </div>
                                 <div class="weekly-delivery-footer">
-                                    <span class="delivery-value" title="Valor total consolidado da cidade">${formatCurrency(g.total_pedido)}</span>
+                                    <span class="delivery-value" title="Valor total consolidado da cidade">${formatCurrency(g.total_disponivel)}</span>
                                     ${checkboxHtml}
                                 </div>
                             </div>
