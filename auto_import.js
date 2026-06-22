@@ -26,7 +26,7 @@ const xlsx = require('./xlsx.js'); // Utiliza a biblioteca já existente na raiz
 // ==========================================
 const CONFIG = {
     // URL de produção do seu Dashboard na Vercel (sem barra no final)
-    API_URL: 'https://projeto-breno-maia.vercel.app', 
+    API_URL: 'https://projeto-pedidos-de-venda-provix.vercel.app', 
 
     // Credenciais de administrador para autenticação
     ADMIN_EMAIL: 'contato.brenomaia@hotmail.com',
