@@ -32,9 +32,8 @@ const CONFIG = {
     ADMIN_EMAIL: 'contato.brenomaia@hotmail.com',
     ADMIN_PASSWORD: 'Doocjp@0172', // COLOQUE A SENHA DA SUA CONTA DE ADMIN AQUI
 
-    // Caminho da planilha gerada pelo ERP
-    // Configurado com o seu arquivo do Google Drive
-    EXCEL_FILE_PATH: 'H:\\Meu Drive\\01.LOGISTICA\\10. SCANNER - EXPEDIÇÃO\\01.PLANILHA DE PREENCHIMENTO - PEDIDO DE VENDAS.xlsx',
+    // Caminho base das análises no Google Drive
+    EXCEL_BASE_PATH: 'H:\\Meu Drive\\01.LOGISTICA\\16.ANÁLISES\\VISÃO TOTAL DE ROMANEIOS',
 
     // Nome exato da aba que o ERP gera na planilha (se houver)
     TARGET_SHEET_NAME: 'MAPA DE PEDIDOS'
@@ -138,14 +137,77 @@ const normalizePedido = (val) => {
     return str;
 };
 
+const resolveExcelPath = () => {
+    const basePath = CONFIG.EXCEL_BASE_PATH;
+    const now = new Date();
+    
+    // 1. Tentar resolver o caminho para o dia de hoje
+    const year = now.getFullYear();
+    const monthNum = String(now.getMonth() + 1).padStart(2, '0');
+    const dayNum = String(now.getDate()).padStart(2, '0');
+    
+    const monthAbbrs = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+    const monthName = monthAbbrs[now.getMonth()];
+    const monthFolder = `${monthNum}.${monthName}`;
+    const dayFolder = `${dayNum}.${monthNum}`;
+    const fileName = `05.FOLLOW-UP PEDIDOS DE VENDA - ${dayFolder}.xlsx`;
+    
+    const todayPath = path.join(basePath, String(year), monthFolder, dayFolder, fileName);
+    if (fs.existsSync(todayPath)) {
+        return todayPath;
+    }
+    
+    console.log(`⚠️ Planilha de hoje não encontrada em: "${todayPath}". Procurando arquivo mais recente...`);
+    
+    // 2. Fallback: procurar o arquivo mais recente na estrutura de pastas
+    try {
+        const yearPath = path.join(basePath, String(year));
+        if (!fs.existsSync(yearPath)) return null;
+        
+        // Listar pastas de meses e ordenar decrescente (mais recente primeiro)
+        const months = fs.readdirSync(yearPath)
+            .filter(m => fs.statSync(path.join(yearPath, m)).isDirectory() && /^\d{2}\.[A-Z]{3}$/.test(m))
+            .sort((a, b) => b.localeCompare(a));
+            
+        for (const mFolder of months) {
+            const mPath = path.join(yearPath, mFolder);
+            // Listar pastas de dias e ordenar decrescente (ex: "23.06" vs "22.06")
+            const days = fs.readdirSync(mPath)
+                .filter(d => fs.statSync(path.join(mPath, d)).isDirectory() && /^\d{2}\.\d{2}$/.test(d))
+                .sort((a, b) => {
+                    const [da, ma] = a.split('.').map(Number);
+                    const [db, mb] = b.split('.').map(Number);
+                    if (mb !== ma) return mb - ma;
+                    return db - da;
+                });
+                
+            for (const dFolder of days) {
+                const dPath = path.join(mPath, dFolder);
+                const files = fs.readdirSync(dPath)
+                    .filter(f => f.startsWith('05.FOLLOW-UP PEDIDOS') && f.endsWith('.xlsx'));
+                if (files.length > 0) {
+                    const finalPath = path.join(dPath, files[0]);
+                    return finalPath;
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Erro ao buscar planilha mais recente:', err.message);
+    }
+    
+    return null;
+};
+
 async function executeImport() {
     console.log(`[${new Date().toLocaleString()}] 🔄 Iniciando importação automática...`);
     
-    // 1. Verificar existência do arquivo Excel
-    if (!fs.existsSync(CONFIG.EXCEL_FILE_PATH)) {
-        console.error(`❌ Erro: Arquivo Excel não encontrado em: "${CONFIG.EXCEL_FILE_PATH}"`);
+    // 1. Verificar e resolver existência do arquivo Excel
+    const excelPath = resolveExcelPath();
+    if (!excelPath) {
+        console.error(`❌ Erro: Nenhuma planilha de pedidos encontrada na estrutura de pastas em: "${CONFIG.EXCEL_BASE_PATH}"`);
         return;
     }
+    console.log(`📌 Planilha selecionada para importação: "${excelPath}"`);
 
     try {
         // 2. Fazer Login na API para obter Token JWT
@@ -190,7 +252,7 @@ async function executeImport() {
 
         // 4. Ler e processar o arquivo Excel localmente
         console.log('📖 Lendo e processando planilha local...');
-        const fileBuffer = fs.readFileSync(CONFIG.EXCEL_FILE_PATH);
+        const fileBuffer = fs.readFileSync(excelPath);
         const workbook = xlsx.read(fileBuffer, { type: 'buffer', cellDates: true });
         
         let sheetName = workbook.SheetNames.find(name => name.trim().toUpperCase() === CONFIG.TARGET_SHEET_NAME.toUpperCase());
