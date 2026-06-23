@@ -280,12 +280,16 @@ module.exports = async (req, res) => {
         try {
             await verifyAdmin();
 
-            const { id, pedido, data_entrega } = req.body;
+            const { id, pedido, data_entrega, status_venda } = req.body;
             if (!id && !pedido) {
                 return res.status(400).json({ error: 'ID ou Número do pedido é obrigatório para atualização.' });
             }
 
-            let query = supabase.from('pedidos').update({ data_entrega: data_entrega || null });
+            const updateData = {};
+            if (data_entrega !== undefined) updateData.data_entrega = data_entrega || null;
+            if (status_venda !== undefined) updateData.status_venda = status_venda || null;
+
+            let query = supabase.from('pedidos').update(updateData);
             
             const cleanPedidoVal = (val) => {
                 if (val === null || val === undefined) return null;

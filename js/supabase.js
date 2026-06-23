@@ -259,6 +259,34 @@
             }
         },
 
+        updateStatusVendaByPedido: async function(pedido, status) {
+            try {
+                await this.checkAdminSession();
+                const session = this.getSession();
+
+                const response = await fetch('/api/pedidos', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({ pedido: pedido, status_venda: status })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    console.warn('[SupabaseService] Status sync failed:', err.error);
+                } else {
+                    const result = await response.json();
+                    console.log('[SupabaseService] Status sync succeeded:', result);
+                }
+                return true;
+            } catch (error) {
+                console.warn('[SupabaseService] Error syncing status with database:', error);
+                return true;
+            }
+        },
+
         syncLocalOverridesToDatabase: async function() {
             try {
                 const savedOverrides = localStorage.getItem('weekly-rescheduled-dates');

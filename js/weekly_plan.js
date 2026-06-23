@@ -483,6 +483,18 @@
         update: function(pedidos) {
             this.allPedidos = pedidos || [];
             
+            // Sincronizar o estado local checkedState com o status_venda vindo do banco de dados
+            this.allPedidos.forEach(p => {
+                const normPedido = String(p.pedido).trim();
+                const statusUpper = String(p.status_venda || '').toUpperCase();
+                if (statusUpper === 'ENTREGUE') {
+                    this.checkedState[normPedido] = true;
+                } else {
+                    this.checkedState[normPedido] = false;
+                }
+            });
+            this.saveCheckedState();
+            
             // Filter pedidos for current week (Monday to Friday)
             const { monday, friday } = this.getWeekRange();
             
@@ -661,15 +673,30 @@
                 // Add event listeners only if admin
                 if (isAdmin) {
                     card.querySelectorAll('.weekly-delivery-checkbox').forEach(checkbox => {
-                        checkbox.addEventListener('change', (e) => {
+                        checkbox.addEventListener('change', async (e) => {
                             const pedidosString = e.target.getAttribute('data-pedido');
                             const checked = e.target.checked;
                             
                             if (pedidosString) {
+                                const newStatus = checked ? 'ENTREGUE' : 'EM ANDAMENTO';
+                                
                                 pedidosString.split(',').forEach(pedidoId => {
                                     this.checkedState[pedidoId.trim()] = checked;
+                                    
+                                    // Também atualizar em memória na lista allPedidos local
+                                    const localPed = this.allPedidos.find(p => String(p.pedido).trim() === String(pedidoId).trim());
+                                    if (localPed) {
+                                        localPed.status_venda = newStatus;
+                                    }
                                 });
                                 this.saveCheckedState();
+
+                                // Sincroniza com o banco de dados
+                                try {
+                                    await window.SupabaseService.updateStatusVendaByPedido(pedidosString, newStatus);
+                                } catch (err) {
+                                    console.error('Falha ao sincronizar status com o banco:', err);
+                                }
                             }
 
                             const label = e.target.nextElementSibling;
