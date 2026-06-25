@@ -32,9 +32,9 @@
 
             const filters = window.FiltersService ? window.FiltersService.getActiveFilters() : {};
             const data = await window.SupabaseService.fetchPedidos(filters);
-            if (window.DashboardService) window.DashboardService.update(data);
-            if (window.TableService) window.TableService.render(data);
-            if (window.WeeklyPlanService) window.WeeklyPlanService.update(data);
+            if (window.DashboardService) window.DashboardService.update(data.filter(p => p.tipo_pedido !== 'PLANEJAMENTO_SEMANAL'));
+            if (window.TableService) window.TableService.render(data.filter(p => p.tipo_pedido !== 'PLANEJAMENTO_SEMANAL'));
+            if (window.WeeklyPlanService) window.WeeklyPlanService.update(data.filter(p => p.tipo_pedido === 'PLANEJAMENTO_SEMANAL'));
         } catch (e) {
             console.error('Error loading data', e);
             showNotification('Erro ao carregar dados', 'error');
