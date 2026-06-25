@@ -171,7 +171,17 @@ module.exports = async (req, res) => {
         try {
             await verifyAdmin();
 
-            const { id, pedido } = req.query;
+            const { id, pedido, tipo_pedido } = req.query;
+
+            if (tipo_pedido === 'PLANEJAMENTO_SEMANAL') {
+                const { error } = await supabase
+                    .from('pedidos')
+                    .delete()
+                    .eq('tipo_pedido', 'PLANEJAMENTO_SEMANAL');
+                if (error) throw error;
+                return res.status(200).json({ success: true, message: 'Planejamento semanal antigo limpo com sucesso.' });
+            }
+
             if (id || pedido) {
                 // Em vez de deletar o registro do banco de dados (que removeria do dashboard),
                 // nós apenas definimos a data_entrega como null, retirando do planejamento semanal
@@ -228,7 +238,7 @@ module.exports = async (req, res) => {
             // Passo 1: Buscar todos os registros do banco de dados para filtrar em memória
             const { data: allRows, error: fetchError } = await supabase
                 .from('pedidos')
-                .select('id, status_venda, saldo_faturar, data_entrega');
+                .select('id, status_venda, saldo_faturar, data_entrega, tipo_pedido');
 
             if (fetchError) throw fetchError;
 
@@ -238,6 +248,9 @@ module.exports = async (req, res) => {
             const fridayTime = friday.getTime();
 
             (allRows || []).forEach(row => {
+                if (row.tipo_pedido === 'PLANEJAMENTO_SEMANAL') {
+                    return; // Ignorar registros de planejamento semanal da limpeza do ERP
+                }
                 const statusUpper = String(row.status_venda || '').toUpperCase();
                 const isDelivered = statusUpper === 'ENTREGUE';
 
