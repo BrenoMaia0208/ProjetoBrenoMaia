@@ -183,6 +183,7 @@ async function executeImport() {
                                     console.log(`📌 Processando ${matchedDay} (${dateStr}) a partir da linha ${r}, coluna ${c}`);
                                     
                                     let lastMunicipio = '';
+                                    let lastPrograma = '';
                                     // As entregas começam duas linhas abaixo do cabeçalho do dia
                                     for (let dataRowIdx = r + 2; dataRowIdx < jsonRows.length; dataRowIdx++) {
                                         const dataRow = jsonRows[dataRowIdx];
@@ -198,9 +199,15 @@ async function executeImport() {
                                         const municipioCell = String(dataRow[c] || '').trim();
                                         if (municipioCell) {
                                             lastMunicipio = municipioCell;
+                                            lastPrograma = ''; // Reset quando muda o município
                                         }
 
-                                        const programa = String(dataRow[c + 1] || '').trim();
+                                        const programaCell = String(dataRow[c + 1] || '').trim();
+                                        if (programaCell) {
+                                            lastPrograma = programaCell;
+                                        }
+
+                                        const programa = lastPrograma;
                                         const grupo = String(dataRow[c + 2] || '').trim();
                                         const valor = parseNumber(dataRow[c + 4]);
                                         
