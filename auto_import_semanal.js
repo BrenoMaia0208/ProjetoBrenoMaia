@@ -213,8 +213,8 @@ async function executeImport() {
                                         
                                         let situacao = String(dataRow[c + 5] || '').trim().toUpperCase();
                                         
-                                        // Ignorar se a linha não contiver cidade (município) ou dados relevantes
-                                        if (!lastMunicipio || lastMunicipio === '' || (!programa && !grupo && valor === 0)) {
+                                        // Ignorar se a linha não contiver cidade (município) ou se o valor/saldo for zero
+                                        if (!lastMunicipio || lastMunicipio === '' || valor === 0) {
                                             continue;
                                         }
 
