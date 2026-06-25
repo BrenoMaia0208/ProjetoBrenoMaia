@@ -132,6 +132,8 @@ async function executeImport() {
         let targetSheetName = null;
         let parsedRows = [];
 
+        const weekdays = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
+
         for (const sheetName of workbook.SheetNames) {
             if (!sheetName.startsWith('SEM')) continue;
             
@@ -139,74 +141,109 @@ async function executeImport() {
             const jsonRows = xlsx.utils.sheet_to_json(sheet, { header: 1, defval: '' });
             if (jsonRows.length < 5) continue;
 
-            // Inspecionar as datas da linha 4 (index 4)
-            const dateRow = jsonRows[4];
+            // Encontrar se a aba possui alguma data que corresponde à semana atual
             let sheetMatchesCurrentWeek = false;
 
-            const colOffsets = [0, 6, 12, 18, 24];
-            for (const colIdx of colOffsets) {
-                const dateStr = parseDateString(dateRow[colIdx]);
-                if (dateStr) {
-                    const parsedDate = new Date(dateStr + 'T12:00:00');
-                    if (parsedDate >= monday && parsedDate <= friday) {
-                        sheetMatchesCurrentWeek = true;
-                        break;
+            for (let r = 0; r < jsonRows.length; r++) {
+                const row = jsonRows[r];
+                for (let c = 0; c < row.length; c++) {
+                    const val = row[c];
+                    if (typeof val === 'string') {
+                        const upper = val.toUpperCase();
+                        if (weekdays.some(day => upper.includes(day))) {
+                            const dateStr = parseDateString(val);
+                            if (dateStr) {
+                                const parsedDate = new Date(dateStr + 'T12:00:00');
+                                if (parsedDate >= monday && parsedDate <= friday) {
+                                    sheetMatchesCurrentWeek = true;
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
+                if (sheetMatchesCurrentWeek) break;
             }
 
             if (sheetMatchesCurrentWeek) {
                 targetSheetName = sheetName;
                 console.log(`🎯 Aba identificada para a semana atual: "${sheetName}"`);
                 
-                // Processar as colunas dessa aba
-                for (const colIdx of colOffsets) {
-                    const headerCell = dateRow[colIdx];
-                    const dateStr = parseDateString(headerCell);
-                    if (!dateStr) continue;
+                // Mapear cada um dos blocos de dias de forma robusta
+                for (let r = 0; r < jsonRows.length; r++) {
+                    const row = jsonRows[r];
+                    for (let c = 0; c < row.length; c++) {
+                        const val = row[c];
+                        if (typeof val === 'string') {
+                            const upper = val.toUpperCase();
+                            const matchedDay = weekdays.find(day => upper.includes(day));
+                            if (matchedDay) {
+                                const dateStr = parseDateString(val);
+                                if (dateStr) {
+                                    console.log(`📌 Processando ${matchedDay} (${dateStr}) a partir da linha ${r}, coluna ${c}`);
+                                    
+                                    let lastMunicipio = '';
+                                    // As entregas começam duas linhas abaixo do cabeçalho do dia
+                                    for (let dataRowIdx = r + 2; dataRowIdx < jsonRows.length; dataRowIdx++) {
+                                        const dataRow = jsonRows[dataRowIdx];
+                                        if (!dataRow || dataRow.length <= c) break;
 
-                    // Iterar linhas a partir do índice 6
-                    for (let r = 6; r < jsonRows.length; r++) {
-                        const rowCells = jsonRows[r];
-                        if (!rowCells || rowCells.length <= colIdx) continue;
+                                        // Verificar se chegou no totalizador do dia
+                                        const checkTotal = String(dataRow[c + 4] || '').trim();
+                                        const checkMun = String(dataRow[c] || '').trim();
+                                        if (checkTotal.includes('TOTAL') || checkMun.includes('TOTAL')) {
+                                            break;
+                                        }
 
-                        const municipio = String(rowCells[colIdx] || '').trim();
-                        if (!municipio || municipio === '' || municipio.toLowerCase().includes('total')) {
-                            continue;
+                                        const municipioCell = String(dataRow[c] || '').trim();
+                                        if (municipioCell) {
+                                            lastMunicipio = municipioCell;
+                                        }
+
+                                        const programa = String(dataRow[c + 1] || '').trim();
+                                        const grupo = String(dataRow[c + 2] || '').trim();
+                                        const valor = parseNumber(dataRow[c + 4]);
+                                        
+                                        let situacao = String(dataRow[c + 5] || '').trim().toUpperCase();
+                                        
+                                        // Ignorar se a linha não contiver cidade (município) ou dados relevantes
+                                        if (!lastMunicipio || lastMunicipio === '' || (!programa && !grupo && valor === 0)) {
+                                            continue;
+                                        }
+
+                                        let statusVenda = 'EM ANDAMENTO';
+                                        if (situacao === 'TRUE' || situacao === 'REALIZADA' || situacao === 'OK') {
+                                            statusVenda = 'ENTREGUE';
+                                        } else if (situacao.includes('REMANEJADO')) {
+                                            statusVenda = 'REMANEJADO';
+                                        } else if (situacao.includes('FALTEIRO')) {
+                                            statusVenda = 'FALTEIRO';
+                                        }
+
+                                        const virtualId = `SEM-${dateStr}-${c}-${dataRowIdx}`;
+
+                                        parsedRows.push({
+                                            nome: lastMunicipio,
+                                            pedido: virtualId,
+                                            cidade: lastMunicipio,
+                                            grupo: grupo || 'OUTROS',
+                                            programa: programa || 'OUTROS',
+                                            total_disponivel: valor,
+                                            total_pedido: valor,
+                                            data_entrega: dateStr,
+                                            status_venda: statusVenda,
+                                            tipo_pedido: 'PLANEJAMENTO_SEMANAL',
+                                            perc_disponivel: 1,
+                                            perc_falteiro: statusVenda === 'FALTEIRO' ? 1 : 0,
+                                            perc_despacho: statusVenda === 'ENTREGUE' ? 1 : 0
+                                        });
+                                    }
+                                }
+                            }
                         }
-
-                        const programa = String(rowCells[colIdx + 1] || '').trim();
-                        const grupo = String(rowCells[colIdx + 2] || '').trim();
-                        const valor = parseNumber(rowCells[colIdx + 3]);
-                        
-                        let situacao = String(rowCells[colIdx + 4] || '').trim().toUpperCase();
-                        let statusVenda = 'EM ANDAMENTO';
-                        if (situacao === 'TRUE' || situacao === 'REALIZADA' || situacao === 'OK') {
-                            statusVenda = 'ENTREGUE';
-                        } else if (situacao === 'REMANEJADO') {
-                            statusVenda = 'REMANEJADO';
-                        }
-
-                        const virtualId = `SEM-${dateStr}-${colIdx}-${r}`;
-
-                        parsedRows.push({
-                            nome: municipio,
-                            pedido: virtualId,
-                            cidade: municipio,
-                            grupo: grupo || 'OUTROS',
-                            programa: programa || 'OUTROS',
-                            total_disponivel: valor,
-                            total_pedido: valor,
-                            data_entrega: dateStr,
-                            status_venda: statusVenda,
-                            tipo_pedido: 'PLANEJAMENTO_SEMANAL',
-                            perc_disponivel: 1,
-                            perc_falteiro: 0,
-                            perc_despacho: statusVenda === 'ENTREGUE' ? 1 : 0
-                        });
                     }
                 }
-                break; // Encontrou a semana atual, pode encerrar a busca
+                break; // Encontrou a semana atual, pode encerrar a busca pelas abas
             }
         }
 
